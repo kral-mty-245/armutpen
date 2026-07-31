@@ -6,7 +6,7 @@
     
     <!-- SEO Başlık ve Açıklamalar -->
     <title>Armut Pen v4.0 - Nambır AI | Canlı Kod Editörü</title>
-    <meta name="description" content="Armut Pen v4.0 ile web kodlarınızı canlı olarak düzenleyin, Nambır AI ile anında kodlar üretin ve projelerinizi geliştirin.">
+    <meta name="description" content="Armut Pen, Nambır AI destekli canlı web kodlama, HTML CSS JS düzenleme ve geliştirme platformudur.">
     <meta name="keywords" content="Armut Pen, Nambır AI, kod editörü, monaco editor, canlı önizleme, HTML CSS JS editör">
     <meta name="author" content="Armut Pen">
     <meta name="robots" content="index, follow">
@@ -103,7 +103,7 @@
 
     <script>
         let editor = null;
-        let codeBlocksData = {}; // Üretilen kod bloklarını saklama hafızası
+        let codeBlocksData = {};
 
         window.onload = () => {
             const savedKey = localStorage.getItem('gemini_api_key');
@@ -192,7 +192,6 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // Kopyalama Butonu Fonksiyonu
         function copyCodeBlock(id) {
             const rawCode = codeBlocksData[id];
             if (rawCode) {
@@ -202,7 +201,6 @@
             }
         }
 
-        // KODU DİREKT MONACO EDITOR'E AKTARAN "KULLAN" BUTONU
         function applyCodeBlock(id) {
             const rawCode = codeBlocksData[id];
             if (rawCode && editor) {
@@ -212,7 +210,6 @@
             }
         }
 
-        // Güvenli Metin Escape İşlemi (HTML etiketlerinin kaybolmasını önler)
         function escapeHTML(str) {
             return str.replace(/&/g, "&amp;")
                       .replace(/</g, "&lt;")
@@ -221,7 +218,6 @@
                       .replace(/'/g, "&#039;");
         }
 
-        // Yanıt İçindeki Kod Bloklarını Özel Kutucuğa Çeviren İşlemci
         function formatAiResponse(text) {
             const codeBlockRegex = /```(?:html|css|js|javascript)?\s*([\s\S]*?)```/g;
             let match;
