@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen v5.2 Studio</title>
+    <title>Armut Pen v6.0 Auto-Pilot Studio</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #1e1e1e; color: #d4d4d4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -61,7 +61,7 @@
         #fullscreen-modal .fs-header { background: #252526; padding: 10px 15px; display: flex; justify-content: space-between; color: white; align-items: center; }
 
         /* AI PANEL */
-        #ai-panel { width: 300px; background-color: #252526; display: flex; flex-direction: column; }
+        #ai-panel { width: 320px; background-color: #252526; display: flex; flex-direction: column; }
         .chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .message { padding: 8px 12px; border-radius: 6px; font-size: 12px; max-width: 90%; line-height: 1.4; word-wrap: break-word; }
         .message.user { background-color: #0e639c; color: white; align-self: flex-end; }
@@ -75,7 +75,7 @@
 
     <header>
         <div class="logo">
-            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v5.2 Ultra</span>
+            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v6.0 Auto-Pilot</span>
         </div>
         <div class="actions">
             <input type="password" id="apiKeyInput" placeholder="Gemini API Key...">
@@ -118,10 +118,11 @@
 
         <!-- AI PANEL -->
         <div id="ai-panel">
-            <div class="panel-header">🤖 Nambır AI Studio</div>
+            <div class="panel-header">🤖 Nambır AI Auto-Pilot</div>
             <div class="chat-history" id="chatHistory">
                 <div class="message ai">
-                    Selam Taha kanka! <b>Nambır AI v5.2</b> aktif. Dış bağımlılıklar kaldırıldı, sistem roket gibi! Kod sorabilir veya referans dosya seçip geliştirebiliriz. 🚀
+                    Selam Taha kanka! <b>Nambır AI v6.0 Otonom Sürüm</b> hazır. ⚡️<br><br>
+                    Artık sohbet ekranında uzun kodlar göstermeyeceğim. Doğrudan dosya açabilir, klasör oluşturabilir, koda müdahale edip silebilir veya projeyi baştan yazabilirim. Sadece ne istediğini söyle! 🚀
                 </div>
             </div>
             <div class="chat-input-area">
@@ -130,10 +131,10 @@
                     <span style="cursor:pointer; color:#ff5555;" id="btnClearRef">✖</span>
                 </div>
                 <select id="refSelect">
-                    <option value="">📎 AI'ya Referans Dosya Bağla...</option>
+                    <option value="">📎 AI'ya Odak Dosya Bağla...</option>
                 </select>
                 <div style="display:flex; gap:6px;">
-                    <input type="text" id="userInput" placeholder="Nambır AI'ya sor..." style="flex:1;">
+                    <input type="text" id="userInput" placeholder="Otonom AI'ya Talimat Ver..." style="flex:1;">
                     <button id="btnSendAi">Gönder</button>
                 </div>
             </div>
@@ -156,9 +157,9 @@
                 "src": ["src/style.css", "src/script.js"]
             },
             files: {
-                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v5.2 Çalışıyor!</h1>\n  <p>Sistem sıfır kilitlenme garantili olarak güncellendi.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
+                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v6.0 Auto-Pilot!</h1>\n  <p>Yapay zeka artık projenize tam kontrol erişimine sahip.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
                 "src/style.css": `body {\n  background: #111827;\n  color: #a6e22e;\n  font-family: sans-serif;\n  text-align: center;\n  padding-top: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #0e639c;\n  color: white;\n  border: none;\n  border-radius: 5px;\n  cursor: pointer;\n}`,
-                "src/script.js": `function selam() {\n  alert("Armut Pen v5.2 Butonları Tamamen Aktif!");\n}`
+                "src/script.js": `function selam() {\n  alert("Nambır AI Projeyi Doğrudan Yönetiyor!");\n}`
             }
         };
 
@@ -175,16 +176,14 @@
 
         // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KISIM ---
         window.addEventListener('DOMContentLoaded', () => {
-            // Kayıtlı Verileri Yükle
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) apiKeyInput.value = savedKey;
 
-            const savedStruct = localStorage.getItem('armut_v52_struct');
+            const savedStruct = localStorage.getItem('armut_v6_struct');
             if (savedStruct) {
                 try { fileStructure = JSON.parse(savedStruct); } catch(e){}
             }
 
-            // Olay Dinleyicileri (Event Listeners)
             document.getElementById('btnSaveKey').addEventListener('click', saveApiKey);
             document.getElementById('btnDownload').addEventListener('click', downloadActiveFile);
             document.getElementById('btnRefresh').addEventListener('click', runPreview);
@@ -198,10 +197,9 @@
             userInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
             refSelect.addEventListener('change', (e) => setReferenceFile(e.target.value));
 
-            // Editör Metin Değişimi
             codeEditor.addEventListener('input', () => {
                 fileStructure.files[activeFile] = codeEditor.value;
-                localStorage.setItem('armut_v52_struct', JSON.stringify(fileStructure));
+                localStorage.setItem('armut_v6_struct', JSON.stringify(fileStructure));
                 updateLineNumbers();
                 runPreview();
             });
@@ -210,7 +208,6 @@
                 lineNumbers.scrollTop = codeEditor.scrollTop;
             });
 
-            // Tab Tuş Desteği
             codeEditor.addEventListener('keydown', (e) => {
                 if (e.key === 'Tab') {
                     e.preventDefault();
@@ -221,7 +218,6 @@
                 }
             });
 
-            // Başlangıç Çizimleri
             openFile(activeFile);
             updateFileTree();
             updateRefSelect();
@@ -249,7 +245,7 @@
             const key = apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem('gemini_api_key', key);
-                alert('API Key Başarıyla Kaydedildi kanka!');
+                alert('API Key Kaydedildi kanka!');
             } else {
                 alert('Lütfen geçerli bir API Key girin!');
             }
@@ -270,49 +266,49 @@
         }
 
         function createNewFileInFolder(folderName, e) {
-            e.stopPropagation();
+            if(e) e.stopPropagation();
             const fileName = prompt(`[${folderName}] Klasörüne Eklenecek Dosya Adı:`);
             if (!fileName) return;
             const fullPath = `${folderName}/${fileName}`;
+            if (!fileStructure.folders[folderName]) fileStructure.folders[folderName] = [];
             fileStructure.folders[folderName].push(fullPath);
             addFileToSystem(fullPath);
         }
 
         function addFileToSystem(filepath) {
-            if (fileStructure.files[filepath] !== undefined) { alert("Bu dosya zaten var!"); return; }
+            if (fileStructure.files[filepath] !== undefined) return;
             fileStructure.files[filepath] = "";
             saveAndRefresh();
             openFile(filepath);
         }
 
         function deleteItem(path, isFolder, e) {
-            e.stopPropagation();
-            if (confirm(`${path} öğesini silmek istediğine emin misin?`)) {
-                if (isFolder) {
-                    (fileStructure.folders[path] || []).forEach(f => delete fileStructure.files[f]);
-                    delete fileStructure.folders[path];
-                } else {
-                    delete fileStructure.files[path];
-                    Object.keys(fileStructure.folders).forEach(fol => {
-                        fileStructure.folders[fol] = fileStructure.folders[fol].filter(x => x !== path);
-                    });
-                }
-                const remaining = Object.keys(fileStructure.files);
-                if (remaining.length > 0) openFile(remaining[0]);
-                saveAndRefresh();
+            if(e) e.stopPropagation();
+            if (isFolder) {
+                (fileStructure.folders[path] || []).forEach(f => delete fileStructure.files[f]);
+                delete fileStructure.folders[path];
+            } else {
+                delete fileStructure.files[path];
+                Object.keys(fileStructure.folders).forEach(fol => {
+                    fileStructure.folders[fol] = fileStructure.folders[fol].filter(x => x !== path);
+                });
             }
+            const remaining = Object.keys(fileStructure.files);
+            if (remaining.length > 0) openFile(remaining[0]);
+            saveAndRefresh();
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('armut_v52_struct', JSON.stringify(fileStructure));
+            localStorage.setItem('armut_v6_struct', JSON.stringify(fileStructure));
             updateFileTree();
             updateRefSelect();
+            renderTabs();
+            runPreview();
         }
 
         function updateFileTree() {
             fileTree.innerHTML = '';
 
-            // Klasörleri Çiz
             Object.keys(fileStructure.folders).forEach(folder => {
                 const fDiv = document.createElement('div');
                 fDiv.className = 'tree-item folder';
@@ -340,7 +336,6 @@
                 fileTree.appendChild(childBox);
             });
 
-            // Kök Dizindeki Dosyalar
             Object.keys(fileStructure.files).forEach(filepath => {
                 let isInFolder = false;
                 Object.values(fileStructure.folders).forEach(arr => {
@@ -359,7 +354,6 @@
                 }
             });
 
-            // Tıklama Event Dinleyicilerini Bağla
             document.querySelectorAll('[data-folder]').forEach(el => {
                 el.onclick = (e) => createNewFileInFolder(el.getAttribute('data-folder'), e);
             });
@@ -382,11 +376,9 @@
             });
         }
 
-        // --- PREVIEW (ÖNİZLEME) ---
         function runPreview() {
             let html = fileStructure.files['index.html'] || '';
             
-            // CSS ve JS Dahil Etme
             Object.keys(fileStructure.files).forEach(path => {
                 if (path.endsWith('.css')) {
                     html += `<style>${fileStructure.files[path]}</style>`;
@@ -432,9 +424,8 @@
             a.click();
         }
 
-        // --- AI ASİSTAN İŞLEMLERİ ---
         function updateRefSelect() {
-            refSelect.innerHTML = '<option value="">📎 AI\'ya Referans Dosya Bağla...</option>';
+            refSelect.innerHTML = '<option value="">📎 AI\'ya Odak Dosya Bağla...</option>';
             Object.keys(fileStructure.files).forEach(filepath => {
                 refSelect.innerHTML += `<option value="${filepath}">${filepath}</option>`;
             });
@@ -462,31 +453,52 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
+        // --- AUTONOMOUS AI ENGINE (YAPAY ZEKA OTONOM YÖNETİMİ) ---
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const prompt = input.value.trim();
             const apiKey = localStorage.getItem('gemini_api_key') || apiKeyInput.value.trim();
 
             if (!prompt) return;
-            if (!apiKey) { alert('Lütfen sol üstteki alana Gemini API Key girip "Key Kaydet" butonuna tıklayın!'); return; }
+            if (!apiKey) { alert('Lütfen sol üst alana Gemini API Key girip kaydedin!'); return; }
 
             addMessage(prompt, 'user');
             input.value = '';
 
-            addMessage('Nambır AI düşünüyor...', 'ai');
+            addMessage('⚡️ Nambır AI Otonom Modda Çalışıyor ve Kod Düzenliyor...', 'ai');
             const loadingMsg = document.getElementById('chatHistory').lastChild;
 
             try {
-                let context = `Sen "Nambır AI" kod asistanısın. Aktif dosya: ${activeFile}\n\n`;
-                if (referenceFile && fileStructure.files[referenceFile]) {
-                    context += `Kullanıcının REFERANS gösterdiği dosya (${referenceFile}):\n\`\`\`\n${fileStructure.files[referenceFile]}\n\`\`\`\n\n`;
-                }
-                context += `Aktif Dosya İçeriği:\n\`\`\`\n${codeEditor.value}\n\`\`\`\n\nKullanıcı Sordusu: ${prompt}`;
+                // Yapay Zekaya Sistem Yetkilerini ve Formatı Öğretme
+                const systemPrompt = `
+Sen "Nambır AI Auto-Pilot" otonom geliştirme asistanısın. Kullanıcı ile sohbet ederken KESİNLİKLE chat alanına kod yazmayacaksın.
+Sen doğrudan projenin yapısını, dosyalarını ve kodlarını kontrol etme yetkisine sahipsin.
+
+MEVCUT PROJE YAPISI:
+${JSON.stringify(fileStructure, null, 2)}
+
+ŞU ANKİ AKTİF DOSYA: ${activeFile}
+
+KULLANICININ İSTEĞİ: "${prompt}"
+
+CEVAP VERİRKEN SADECE VE SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER. BAŞKA HİÇBİR AÇIKLAMA VEYA METİN YAZMA!
+
+JSON Formatı Örneği:
+{
+  "summary": "İşlem hakkında kullanıcıya kısa Türkçe açıklama (örn: index.html ve style.css güncellendi, yeni klasör oluşturuldu)",
+  "createFolders": ["yeni_klasor_adi"],
+  "deleteItems": ["silinecek_dosya_veya_klasor_yolu"],
+  "updateFiles": {
+    "index.html": "güncellenmiş tam kod...",
+    "src/yeni_dosya.js": "yeni dosyanın tam kodu..."
+  }
+}
+                `;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
                 });
 
                 const data = await response.json();
@@ -497,8 +509,57 @@
                 }
 
                 if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-                    const aiReply = data.candidates[0].content.parts[0].text;
-                    loadingMsg.innerHTML = aiReply.replace(/\n/g, '<br>');
+                    let rawReply = data.candidates[0].content.parts[0].text;
+                    
+                    // JSON Bloğunu Ayıkla
+                    rawReply = rawReply.replace(/```json/g, '').replace(/```/g, '').trim();
+                    
+                    try {
+                        const aiAction = JSON.parse(rawReply);
+                        
+                        // 1. Klasörleri Oluştur
+                        if (aiAction.createFolders && Array.isArray(aiAction.createFolders)) {
+                            aiAction.createFolders.forEach(fol => {
+                                if (!fileStructure.folders[fol]) fileStructure.folders[fol] = [];
+                            });
+                        }
+
+                        // 2. Silinecek Öğe Varsa Sil
+                        if (aiAction.deleteItems && Array.isArray(aiAction.deleteItems)) {
+                            aiAction.deleteItems.forEach(item => {
+                                deleteItem(item, !!fileStructure.folders[item]);
+                            });
+                        }
+
+                        // 3. Dosyaları Güncelle / Yeni Dosya Ekle
+                        if (aiAction.updateFiles) {
+                            Object.keys(aiAction.updateFiles).forEach(filepath => {
+                                fileStructure.files[filepath] = aiAction.updateFiles[filepath];
+                                
+                                // Dosya bir klasör altındaysa ve klasör kaydı yoksa bağla
+                                if (filepath.includes('/')) {
+                                    const folName = filepath.split('/')[0];
+                                    if (!fileStructure.folders[folName]) fileStructure.folders[folName] = [];
+                                    if (!fileStructure.folders[folName].includes(filepath)) {
+                                        fileStructure.folders[folName].push(filepath);
+                                    }
+                                }
+                            });
+                        }
+
+                        // Değişiklikleri Tam Kaydet ve Görünümleri Yenile
+                        saveAndRefresh();
+                        if (aiAction.updateFiles && aiAction.updateFiles[activeFile] !== undefined) {
+                            codeEditor.value = fileStructure.files[activeFile];
+                            updateLineNumbers();
+                        }
+
+                        loadingMsg.innerHTML = `✅ <b>İşlem Tamamlandı:</b> ${aiAction.summary || 'Proje güncellendi.'}`;
+
+                    } catch(jsonErr) {
+                        loadingMsg.innerText = `⚠️ Yapay Zeka Format Hatası: Değişiklikler uygulanamadı. Lütfen tekrar deneyin.`;
+                    }
+
                 } else {
                     loadingMsg.innerText = "Yanıt alınamadı.";
                 }
