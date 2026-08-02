@@ -3,71 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen v5.1 Studio</title>
-    <!-- JSZip & FileSaver Kütüphaneleri -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <!-- Monaco Editor Loader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
-
+    <title>Armut Pen v5.2 Studio</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #d4d4d4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #1e1e1e; color: #d4d4d4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
+        /* HEADER */
         header { background-color: #252526; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; height: 45px; }
-        .logo { font-weight: bold; font-size: 16px; color: #a6e22e; display: flex; align-items: center; gap: 8px; }
-        .actions { display: flex; gap: 6px; align-items: center; }
-        input[type="text"], input[type="password"], select { background-color: #3c3c3c; border: 1px solid #555; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; outline: none; }
-        button { background-color: #0e639c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: background 0.2s; }
+        .logo { font-weight: bold; font-size: 15px; color: #a6e22e; display: flex; align-items: center; gap: 8px; }
+        .actions { display: flex; gap: 8px; align-items: center; }
+        input[type="text"], input[type="password"], select { background-color: #3c3c3c; border: 1px solid #555; color: white; padding: 5px 8px; border-radius: 4px; font-size: 12px; outline: none; }
+        button { background-color: #0e639c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: background 0.2s; }
         button:hover { background-color: #1177bb; }
         button.secondary { background-color: #3c3c3c; }
         button.secondary:hover { background-color: #505050; }
         button.success { background-color: #28a745; }
         button.success:hover { background-color: #218838; }
 
+        /* WORKSPACE */
         .workspace { display: flex; flex: 1; height: calc(100vh - 45px); }
         
-        /* Sol Dosya Ağacı (Sidebar) */
-        #sidebar { width: 240px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 8px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        /* SIDEBAR (GEZGİN) */
+        #sidebar { width: 230px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; user-select: none; }
+        .sidebar-header { padding: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
         .tree-actions { display: flex; gap: 4px; }
         .file-tree { flex: 1; overflow-y: auto; padding: 5px 0; }
         
-        .tree-item { padding: 5px 10px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #cccccc; user-select: none; }
+        .tree-item { padding: 6px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #cccccc; }
         .tree-item:hover { background-color: #2a2d2e; }
         .tree-item.active { background-color: #37373d; color: #fff; border-left: 3px solid #0e639c; }
         .tree-item.folder { font-weight: bold; color: #e8a838; }
-        .tree-item .del-btn { display: none; color: #ff5555; font-size: 11px; font-weight: bold; }
+        .tree-item .del-btn { display: none; color: #ff5555; font-size: 11px; font-weight: bold; padding: 2px 4px; }
         .tree-item:hover .del-btn { display: inline; }
         .tree-item .add-file-btn { display: none; color: #a6e22e; font-size: 11px; font-weight: bold; margin-right: 6px; }
         .tree-item.folder:hover .add-file-btn { display: inline; }
         .folder-children { padding-left: 15px; }
 
-        /* Editör Paneli */
-        #editor-panel { flex: 1.2; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; }
+        /* EDITOR PANEL */
+        #editor-panel { flex: 1.2; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background-color: #1e1e1e; }
         .tabs { background-color: #2d2d2d; display: flex; overflow-x: auto; border-bottom: 1px solid #3c3c3c; }
-        .tab { padding: 6px 14px; font-size: 12px; background: #2d2d2d; color: #969696; border-right: 1px solid #252526; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .tab { padding: 8px 14px; font-size: 12px; background: #2d2d2d; color: #969696; border-right: 1px solid #252526; cursor: pointer; display: flex; align-items: center; gap: 6px; }
         .tab.active { background: #1e1e1e; color: #fff; border-top: 2px solid #0e639c; }
-        #editor-container { flex: 1; height: 100%; min-height: 200px; }
+        
+        /* EDITOR TEXTAREA & LINE NUMBERS */
+        .editor-wrapper { flex: 1; display: flex; background: #1e1e1e; overflow: hidden; position: relative; }
+        .line-numbers { width: 40px; background-color: #1e1e1e; color: #858585; text-align: right; padding: 10px 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.5; border-right: 1px solid #333; user-select: none; }
+        textarea#codeEditor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; outline: none; padding: 10px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.5; resize: none; tab-size: 2; white-space: pre; overflow: auto; }
 
-        /* Önizleme Paneli */
-        #preview-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background: white; position: relative; }
+        /* PREVIEW PANEL */
+        #preview-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background: #ffffff; }
         .panel-header { background-color: #2d2d2d; padding: 6px 12px; font-size: 12px; font-weight: bold; color: #aaa; border-bottom: 1px solid #3c3c3c; display: flex; justify-content: space-between; align-items: center; }
-        iframe { flex: 1; width: 100%; height: 100%; border: none; background: #fff; }
+        iframe { flex: 1; width: 100%; height: 100%; border: none; background: #ffffff; }
 
-        /* Tam Ekran Modal */
+        /* FULLSCREEN MODAL */
         #fullscreen-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; flex-direction: column; }
         #fullscreen-modal.active { display: flex; }
         #fullscreen-modal .fs-header { background: #252526; padding: 10px 15px; display: flex; justify-content: space-between; color: white; align-items: center; }
 
-        /* AI Asistan Panel */
-        #ai-panel { width: 320px; background-color: #252526; display: flex; flex-direction: column; }
+        /* AI PANEL */
+        #ai-panel { width: 300px; background-color: #252526; display: flex; flex-direction: column; }
         .chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 8px 12px; border-radius: 6px; font-size: 12px; max-width: 95%; line-height: 1.4; word-wrap: break-word; }
+        .message { padding: 8px 12px; border-radius: 6px; font-size: 12px; max-width: 90%; line-height: 1.4; word-wrap: break-word; }
         .message.user { background-color: #0e639c; color: white; align-self: flex-end; }
         .message.ai { background-color: #333333; color: #d4d4d4; align-self: flex-start; border: 1px solid #444; }
         
-        .chat-input-area { padding: 8px; background-color: #1e1e1e; border-top: 1px solid #3c3c3c; display: flex; flex-direction: column; gap: 6px; }
+        .chat-input-area { padding: 10px; background-color: #1e1e1e; border-top: 1px solid #3c3c3c; display: flex; flex-direction: column; gap: 8px; }
         .ref-file-box { font-size: 11px; color: #a6e22e; display: flex; align-items: center; justify-content: space-between; background: #252526; padding: 4px 8px; border-radius: 4px; display: none; }
     </style>
 </head>
@@ -75,199 +75,203 @@
 
     <header>
         <div class="logo">
-            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v5.1 Studio</span>
+            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v5.2 Ultra</span>
         </div>
         <div class="actions">
             <input type="password" id="apiKeyInput" placeholder="Gemini API Key...">
-            <button class="secondary" onclick="saveApiKey()">Key Kaydet</button>
-            <button class="success" onclick="downloadProjectZip()">📦 Cihaza İndir (.ZIP)</button>
-            <button onclick="runPreview()">🔄 Yenile</button>
+            <button class="secondary" id="btnSaveKey">Key Kaydet</button>
+            <button class="success" id="btnDownload">📄 Dosyayı İndir</button>
+            <button id="btnRefresh">🔄 Yenile</button>
         </div>
     </header>
 
     <div class="workspace">
-        <!-- SOL SIDEBAR: DOSYA KONTROLÜ -->
+        <!-- SIDEBAR -->
         <div id="sidebar">
             <div class="sidebar-header">
                 <span>GEZGİN</span>
                 <div class="tree-actions">
-                    <button style="padding:2px 5px; font-size:10px;" onclick="createNewFolder()">+ Klasör</button>
-                    <button style="padding:2px 5px; font-size:10px;" onclick="createNewFileRoot()">+ Dosya</button>
+                    <button style="padding:2px 5px; font-size:10px;" id="btnAddFolder">+ Klasör</button>
+                    <button style="padding:2px 5px; font-size:10px;" id="btnAddFile">+ Dosya</button>
                 </div>
             </div>
             <div class="file-tree" id="fileTree"></div>
         </div>
 
-        <!-- ORTA PANEL: EDİTÖR -->
+        <!-- EDITOR PANEL -->
         <div id="editor-panel">
             <div class="tabs" id="tabsHeader"></div>
-            <div id="editor-container"></div>
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea id="codeEditor" spellcheck="false"></textarea>
+            </div>
         </div>
 
-        <!-- SAĞ PANEL: ÖNİZLEME -->
+        <!-- PREVIEW PANEL -->
         <div id="preview-panel">
-            <div class="panel-header" style="color: #ddd;">
+            <div class="panel-header">
                 <span>Canlı Önizleme</span>
-                <button class="secondary" style="font-size: 11px;" onclick="toggleFullScreen(true)">⛶ Tam Ekran Gör</button>
+                <button class="secondary" style="font-size: 11px;" id="btnFullscreen">⛶ Tam Ekran Gör</button>
             </div>
             <iframe id="preview-frame"></iframe>
         </div>
 
-        <!-- SAĞ PANEL: AI ASİSTAN -->
+        <!-- AI PANEL -->
         <div id="ai-panel">
             <div class="panel-header">🤖 Nambır AI Studio</div>
             <div class="chat-history" id="chatHistory">
                 <div class="message ai">
-                    Selam Taha kanka! <b>Nambır AI v5.1</b> hazır. İster kod sor, ister klasörlerindeki dosyaları **referans gösterip** geliştirme yapalım! 🚀
+                    Selam Taha kanka! <b>Nambır AI v5.2</b> aktif. Dış bağımlılıklar kaldırıldı, sistem roket gibi! Kod sorabilir veya referans dosya seçip geliştirebiliriz. 🚀
                 </div>
             </div>
             <div class="chat-input-area">
                 <div id="refFileBox" class="ref-file-box">
                     <span id="refFileName">📄 Referans: Yok</span>
-                    <span style="cursor:pointer; color:#ff5555;" onclick="clearReference()">✖</span>
+                    <span style="cursor:pointer; color:#ff5555;" id="btnClearRef">✖</span>
                 </div>
-                <div style="display:flex; gap:4px;">
-                    <select id="refSelect" style="flex:1;" onchange="setReferenceFile(this.value)">
-                        <option value="">📎 AI'ya Referans Dosya Bağla...</option>
-                    </select>
-                </div>
-                <div style="display:flex; gap:4px;">
-                    <input type="text" id="userInput" placeholder="Nambır AI'ya sor..." onkeydown="if(event.key==='Enter') sendMessage()">
-                    <button onclick="sendMessage()">Gönder</button>
+                <select id="refSelect">
+                    <option value="">📎 AI'ya Referans Dosya Bağla...</option>
+                </select>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="userInput" placeholder="Nambır AI'ya sor..." style="flex:1;">
+                    <button id="btnSendAi">Gönder</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TAM EKRAN PREVIEW MODAL -->
+    <!-- FULLSCREEN MODAL -->
     <div id="fullscreen-modal">
         <div class="fs-header">
             <span>🌐 Canlı Tam Ekran Önizleme</span>
-            <button class="secondary" onclick="toggleFullScreen(false)">❌ Kapat</button>
+            <button class="secondary" id="btnCloseFs">❌ Kapat</button>
         </div>
         <iframe id="fs-preview-frame"></iframe>
     </div>
 
     <script>
-        // Dil Haritası
-        const languageMap = {
-            'html': 'html', 'css': 'css', 'js': 'javascript', 'json': 'json',
-            'py': 'python', 'cpp': 'cpp', 'c': 'cpp', 'cs': 'csharp',
-            'java': 'java', 'php': 'php', 'ts': 'typescript', 'sql': 'sql',
-            'rb': 'ruby', 'go': 'go', 'md': 'markdown'
-        };
-
-        // Varsayılan Dosya & Klasör Yapısı
+        // --- SİSTEM DEĞİŞKENLERİ ---
         let fileStructure = {
-            "folders": {
-                "src": ["script.js", "style.css"]
+            folders: {
+                "src": ["src/style.css", "src/script.js"]
             },
-            "files": {
-                "index.html": {
-                    language: "html",
-                    content: `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v5.1 Studio!</h1>\n  <p>Klasör ve Dosya Ağacı Sorunsuz Çalışıyor.</p>\n  <button onclick="selamVer()">Tıkla</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`
-                },
-                "src/style.css": {
-                    language: "css",
-                    content: `body { background: #111827; color: #8bc34a; font-family: sans-serif; text-align: center; padding-top: 50px; }\nbutton { padding: 10px 20px; background: #0e639c; color: white; border: none; border-radius: 5px; cursor: pointer; }`
-                },
-                "src/script.js": {
-                    language: "javascript",
-                    content: `function selamVer() {\n  alert("Armut Pen v5.1 Sistemleri Aktif!");\n}`
-                }
+            files: {
+                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v5.2 Çalışıyor!</h1>\n  <p>Sistem sıfır kilitlenme garantili olarak güncellendi.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
+                "src/style.css": `body {\n  background: #111827;\n  color: #a6e22e;\n  font-family: sans-serif;\n  text-align: center;\n  padding-top: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #0e639c;\n  color: white;\n  border: none;\n  border-radius: 5px;\n  cursor: pointer;\n}`,
+                "src/script.js": `function selam() {\n  alert("Armut Pen v5.2 Butonları Tamamen Aktif!");\n}`
             }
         };
 
         let activeFile = "index.html";
         let referenceFile = null;
-        let editor = null;
 
-        // BÜTÜN BUTONLAR İÇİN KESİN ÇALIŞAN TETİKLEYİCİLER
-        window.onload = () => {
+        // --- DOM ELEMANLARI ---
+        const codeEditor = document.getElementById('codeEditor');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const fileTree = document.getElementById('fileTree');
+        const tabsHeader = document.getElementById('tabsHeader');
+        const refSelect = document.getElementById('refSelect');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+
+        // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KISIM ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Kayıtlı Verileri Yükle
             const savedKey = localStorage.getItem('gemini_api_key');
-            if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
+            if (savedKey) apiKeyInput.value = savedKey;
 
-            const savedStruct = localStorage.getItem('armut_v5_struct');
+            const savedStruct = localStorage.getItem('armut_v52_struct');
             if (savedStruct) {
                 try { fileStructure = JSON.parse(savedStruct); } catch(e){}
             }
 
-            initMonaco();
-            updateFileTree();
-            updateRefSelect();
-        };
+            // Olay Dinleyicileri (Event Listeners)
+            document.getElementById('btnSaveKey').addEventListener('click', saveApiKey);
+            document.getElementById('btnDownload').addEventListener('click', downloadActiveFile);
+            document.getElementById('btnRefresh').addEventListener('click', runPreview);
+            document.getElementById('btnAddFolder').addEventListener('click', createNewFolder);
+            document.getElementById('btnAddFile').addEventListener('click', createNewFileRoot);
+            document.getElementById('btnFullscreen').addEventListener('click', () => toggleFullscreen(true));
+            document.getElementById('btnCloseFs').addEventListener('click', () => toggleFullscreen(false));
+            document.getElementById('btnSendAi').addEventListener('click', sendMessage);
+            document.getElementById('btnClearRef').addEventListener('click', clearReference);
+            
+            userInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
+            refSelect.addEventListener('change', (e) => setReferenceFile(e.target.value));
 
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (key) {
-                localStorage.setItem('gemini_api_key', key);
-                alert('API Key kaydedildi kanka!');
-            } else {
-                alert('Lütfen geçerli bir Key girin!');
-            }
-        }
-
-        function initMonaco() {
-            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
-            require(['vs/editor/editor.main'], function() {
-                const fileData = fileStructure.files[activeFile] || { content: "", language: "html" };
-                editor = monaco.editor.create(document.getElementById('editor-container'), {
-                    value: fileData.content,
-                    language: fileData.language,
-                    theme: 'vs-dark',
-                    automaticLayout: true,
-                    fontSize: 13,
-                    minimap: { enabled: false }
-                });
-
-                editor.onDidChangeModelContent(() => {
-                    if (fileStructure.files[activeFile]) {
-                        fileStructure.files[activeFile].content = editor.getValue();
-                        localStorage.setItem('armut_v5_struct', JSON.stringify(fileStructure));
-                        runPreview();
-                    }
-                });
-
-                renderTabs();
+            // Editör Metin Değişimi
+            codeEditor.addEventListener('input', () => {
+                fileStructure.files[activeFile] = codeEditor.value;
+                localStorage.setItem('armut_v52_struct', JSON.stringify(fileStructure));
+                updateLineNumbers();
                 runPreview();
             });
+
+            codeEditor.addEventListener('scroll', () => {
+                lineNumbers.scrollTop = codeEditor.scrollTop;
+            });
+
+            // Tab Tuş Desteği
+            codeEditor.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = codeEditor.selectionStart;
+                    const end = codeEditor.selectionEnd;
+                    codeEditor.value = codeEditor.value.substring(0, start) + "  " + codeEditor.value.substring(end);
+                    codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+                }
+            });
+
+            // Başlangıç Çizimleri
+            openFile(activeFile);
+            updateFileTree();
+            updateRefSelect();
+        });
+
+        // --- EDİTÖR & DOSYA İŞLEMLERİ ---
+        function updateLineNumbers() {
+            const lines = codeEditor.value.split('\n').length;
+            let linesStr = '';
+            for (let i = 1; i <= lines; i++) linesStr += i + '<br>';
+            lineNumbers.innerHTML = linesStr;
         }
 
         function openFile(filepath) {
-            if (!fileStructure.files[filepath]) return;
-            if (editor) {
-                if(fileStructure.files[activeFile]) {
-                    fileStructure.files[activeFile].content = editor.getValue();
-                }
-                activeFile = filepath;
-                const ext = filepath.split('.').pop().toLowerCase();
-                const lang = languageMap[ext] || 'plaintext';
-
-                monaco.editor.setModelLanguage(editor.getModel(), lang);
-                editor.setValue(fileStructure.files[filepath].content);
-            }
+            if (fileStructure.files[filepath] === undefined) return;
+            activeFile = filepath;
+            codeEditor.value = fileStructure.files[filepath];
+            updateLineNumbers();
             renderTabs();
             updateFileTree();
+            runPreview();
         }
 
-        // KLASÖR VE DOSYA OLUŞTURMA İŞLEMLERİ
+        function saveApiKey() {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                alert('API Key Başarıyla Kaydedildi kanka!');
+            } else {
+                alert('Lütfen geçerli bir API Key girin!');
+            }
+        }
+
         function createNewFolder() {
             const folderName = prompt("Yeni Klasör Adı:");
             if (!folderName) return;
-            if (fileStructure.folders[folderName]) { alert("Bu klasör zaten var!"); return; }
+            if (fileStructure.folders[folderName]) { alert("Bu klasör var!"); return; }
             fileStructure.folders[folderName] = [];
             saveAndRefresh();
         }
 
         function createNewFileRoot() {
-            const fileName = prompt("Kök Dizine Dosya Adı (Örn: app.py, style.css):");
+            const fileName = prompt("Kök Dizine Dosya Adı (Örn: script.js):");
             if (!fileName) return;
             addFileToSystem(fileName);
         }
 
         function createNewFileInFolder(folderName, e) {
             e.stopPropagation();
-            const fileName = prompt(`[${folderName}] Klasörü İçine Dosya Adı (Örn: script.js):`);
+            const fileName = prompt(`[${folderName}] Klasörüne Eklenecek Dosya Adı:`);
             if (!fileName) return;
             const fullPath = `${folderName}/${fileName}`;
             fileStructure.folders[folderName].push(fullPath);
@@ -275,17 +279,15 @@
         }
 
         function addFileToSystem(filepath) {
-            if (fileStructure.files[filepath]) { alert("Bu dosya zaten mevcut!"); return; }
-            const ext = filepath.split('.').pop().toLowerCase();
-            const lang = languageMap[ext] || 'plaintext';
-            fileStructure.files[filepath] = { language: lang, content: "" };
-            openFile(filepath);
+            if (fileStructure.files[filepath] !== undefined) { alert("Bu dosya zaten var!"); return; }
+            fileStructure.files[filepath] = "";
             saveAndRefresh();
+            openFile(filepath);
         }
 
         function deleteItem(path, isFolder, e) {
             e.stopPropagation();
-            if (confirm(`${path} silinsin mi?`)) {
+            if (confirm(`${path} öğesini silmek istediğine emin misin?`)) {
                 if (isFolder) {
                     (fileStructure.folders[path] || []).forEach(f => delete fileStructure.files[f]);
                     delete fileStructure.folders[path];
@@ -295,52 +297,50 @@
                         fileStructure.folders[fol] = fileStructure.folders[fol].filter(x => x !== path);
                     });
                 }
-                const remainingFiles = Object.keys(fileStructure.files);
-                if (remainingFiles.length > 0) activeFile = remainingFiles[0];
+                const remaining = Object.keys(fileStructure.files);
+                if (remaining.length > 0) openFile(remaining[0]);
                 saveAndRefresh();
-                if (remainingFiles.length > 0) openFile(activeFile);
             }
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('armut_v5_struct', JSON.stringify(fileStructure));
+            localStorage.setItem('armut_v52_struct', JSON.stringify(fileStructure));
             updateFileTree();
             updateRefSelect();
         }
 
         function updateFileTree() {
-            const tree = document.getElementById('fileTree');
-            tree.innerHTML = '';
+            fileTree.innerHTML = '';
 
             // Klasörleri Çiz
             Object.keys(fileStructure.folders).forEach(folder => {
-                const fItem = document.createElement('div');
-                fItem.className = 'tree-item folder';
-                fItem.innerHTML = `
+                const fDiv = document.createElement('div');
+                fDiv.className = 'tree-item folder';
+                fDiv.innerHTML = `
                     <span>📁 ${folder}</span>
                     <div>
-                        <span class="add-file-btn" onclick="createNewFileInFolder('${folder}', event)">+ Dosya</span>
-                        <span class="del-btn" onclick="deleteItem('${folder}', true, event)">✖</span>
+                        <span class="add-file-btn" data-folder="${folder}">+ Dosya</span>
+                        <span class="del-btn" data-del-folder="${folder}">✖</span>
                     </div>
                 `;
-                tree.appendChild(fItem);
+                fileTree.appendChild(fDiv);
 
                 const childBox = document.createElement('div');
                 childBox.className = 'folder-children';
-                (fileStructure.folders[folder] || []).forEach(childPath => {
-                    const cItem = document.createElement('div');
-                    cItem.className = `tree-item ${childPath === activeFile ? 'active' : ''}`;
-                    cItem.onclick = () => openFile(childPath);
-                    cItem.innerHTML = `
-                        <span>📄 ${childPath.split('/').pop()}</span>
-                        <span class="del-btn" onclick="deleteItem('${childPath}', false, event)">✖</span>
+                (fileStructure.folders[folder] || []).forEach(cPath => {
+                    const cDiv = document.createElement('div');
+                    cDiv.className = `tree-item ${cPath === activeFile ? 'active' : ''}`;
+                    cDiv.innerHTML = `
+                        <span>📄 ${cPath.split('/').pop()}</span>
+                        <span class="del-btn" data-del-file="${cPath}">✖</span>
                     `;
-                    childBox.appendChild(cItem);
+                    cDiv.addEventListener('click', () => openFile(cPath));
+                    childBox.appendChild(cDiv);
                 });
-                tree.appendChild(childBox);
+                fileTree.appendChild(childBox);
             });
 
-            // Kök Dizindeki Dosyaları Çiz
+            // Kök Dizindeki Dosyalar
             Object.keys(fileStructure.files).forEach(filepath => {
                 let isInFolder = false;
                 Object.values(fileStructure.folders).forEach(arr => {
@@ -350,40 +350,55 @@
                 if (!isInFolder) {
                     const item = document.createElement('div');
                     item.className = `tree-item ${filepath === activeFile ? 'active' : ''}`;
-                    item.onclick = () => openFile(filepath);
                     item.innerHTML = `
                         <span>📄 ${filepath}</span>
-                        <span class="del-btn" onclick="deleteItem('${filepath}', false, event)">✖</span>
+                        <span class="del-btn" data-del-file="${filepath}">✖</span>
                     `;
-                    tree.appendChild(item);
+                    item.addEventListener('click', () => openFile(filepath));
+                    fileTree.appendChild(item);
                 }
+            });
+
+            // Tıklama Event Dinleyicilerini Bağla
+            document.querySelectorAll('[data-folder]').forEach(el => {
+                el.onclick = (e) => createNewFileInFolder(el.getAttribute('data-folder'), e);
+            });
+            document.querySelectorAll('[data-del-folder]').forEach(el => {
+                el.onclick = (e) => deleteItem(el.getAttribute('data-del-folder'), true, e);
+            });
+            document.querySelectorAll('[data-del-file]').forEach(el => {
+                el.onclick = (e) => deleteItem(el.getAttribute('data-del-file'), false, e);
             });
         }
 
         function renderTabs() {
-            const tabsHeader = document.getElementById('tabsHeader');
             tabsHeader.innerHTML = '';
             Object.keys(fileStructure.files).forEach(filepath => {
                 const tab = document.createElement('div');
                 tab.className = `tab ${filepath === activeFile ? 'active' : ''}`;
-                tab.onclick = () => openFile(filepath);
                 tab.innerText = filepath.split('/').pop();
+                tab.addEventListener('click', () => openFile(filepath));
                 tabsHeader.appendChild(tab);
             });
         }
 
+        // --- PREVIEW (ÖNİZLEME) ---
         function runPreview() {
-            let html = fileStructure.files['index.html'] ? fileStructure.files['index.html'].content : '';
+            let html = fileStructure.files['index.html'] || '';
             
-            // CSS ve JS'leri içe aktarma
+            // CSS ve JS Dahil Etme
             Object.keys(fileStructure.files).forEach(path => {
                 if (path.endsWith('.css')) {
-                    html += `<style>${fileStructure.files[path].content}</style>`;
+                    html += `<style>${fileStructure.files[path]}</style>`;
                 }
-                if (path.endsWith('.js') && path !== 'script.js') {
-                    html += `<script>${fileStructure.files[path].content}<\/script>`;
+                if (path.endsWith('.js') && !path.includes('script.js')) {
+                    html += `<script>${fileStructure.files[path]}<\/script>`;
                 }
             });
+
+            if(fileStructure.files['src/script.js']) {
+                html += `<script>${fileStructure.files['src/script.js']}<\/script>`;
+            }
 
             const frame = document.getElementById('preview-frame');
             const frameDoc = frame.contentDocument || frame.contentWindow.document;
@@ -398,30 +413,30 @@
             fsFrameDoc.close();
         }
 
-        function toggleFullScreen(show) {
+        function toggleFullscreen(show) {
             const modal = document.getElementById('fullscreen-modal');
-            modal.style.display = show ? 'flex' : 'none';
-        }
-
-        function downloadProjectZip() {
-            if (typeof JSZip === 'undefined') {
-                alert("İndirme kütüphanesi yükleniyor, lütfen 2 saniye sonra tekrar deneyin!");
-                return;
+            if (show) {
+                modal.classList.add('active');
+                runPreview();
+            } else {
+                modal.classList.remove('active');
             }
-            const zip = new JSZip();
-            Object.keys(fileStructure.files).forEach(path => {
-                zip.file(path, fileStructure.files[path].content);
-            });
-            zip.generateAsync({ type: "blob" }).then(function(content) {
-                saveAs(content, "armut-pen-proje.zip");
-            });
         }
 
+        function downloadActiveFile() {
+            const content = codeEditor.value;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = activeFile.split('/').pop();
+            a.click();
+        }
+
+        // --- AI ASİSTAN İŞLEMLERİ ---
         function updateRefSelect() {
-            const select = document.getElementById('refSelect');
-            select.innerHTML = '<option value="">📎 AI'ya Referans Dosya Bağla...</option>';
+            refSelect.innerHTML = '<option value="">📎 AI\'ya Referans Dosya Bağla...</option>';
             Object.keys(fileStructure.files).forEach(filepath => {
-                select.innerHTML += `<option value="${filepath}">${filepath}</option>`;
+                refSelect.innerHTML += `<option value="${filepath}">${filepath}</option>`;
             });
         }
 
@@ -434,7 +449,7 @@
 
         function clearReference() {
             referenceFile = null;
-            document.getElementById('refSelect').value = '';
+            refSelect.value = '';
             document.getElementById('refFileBox').style.display = 'none';
         }
 
@@ -450,10 +465,10 @@
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const prompt = input.value.trim();
-            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('apiKeyInput').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key') || apiKeyInput.value.trim();
 
             if (!prompt) return;
-            if (!apiKey) { alert('Lütfen önce yukarıya Gemini API Key girip kaydedin!'); return; }
+            if (!apiKey) { alert('Lütfen sol üstteki alana Gemini API Key girip "Key Kaydet" butonuna tıklayın!'); return; }
 
             addMessage(prompt, 'user');
             input.value = '';
@@ -464,9 +479,9 @@
             try {
                 let context = `Sen "Nambır AI" kod asistanısın. Aktif dosya: ${activeFile}\n\n`;
                 if (referenceFile && fileStructure.files[referenceFile]) {
-                    context += `Kullanıcının REFERANS bağladığı dosya (${referenceFile}):\n\`\`\`\n${fileStructure.files[referenceFile].content}\n\`\`\`\n\n`;
+                    context += `Kullanıcının REFERANS gösterdiği dosya (${referenceFile}):\n\`\`\`\n${fileStructure.files[referenceFile]}\n\`\`\`\n\n`;
                 }
-                context += `Aktif Dosya İçeriği:\n\`\`\`\n${editor ? editor.getValue() : ''}\n\`\`\`\n\nKullanıcı Sordusu: ${prompt}`;
+                context += `Aktif Dosya İçeriği:\n\`\`\`\n${codeEditor.value}\n\`\`\`\n\nKullanıcı Sordusu: ${prompt}`;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
                     method: 'POST',
