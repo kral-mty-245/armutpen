@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen v6.0 Auto-Pilot Studio</title>
+    <title>Armut Pen v6.1 Studio</title>
+    <!-- Dahili JSZip ve FileSaver Bağlantıları (Güvenli & Kilitlenmesiz) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #1e1e1e; color: #d4d4d4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -75,12 +78,12 @@
 
     <header>
         <div class="logo">
-            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v6.0 Auto-Pilot</span>
+            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v6.1 ZIP-Master</span>
         </div>
         <div class="actions">
             <input type="password" id="apiKeyInput" placeholder="Gemini API Key...">
             <button class="secondary" id="btnSaveKey">Key Kaydet</button>
-            <button class="success" id="btnDownload">📄 Dosyayı İndir</button>
+            <button class="success" id="btnDownloadZip">📦 Tüm Projeyi İndir (.ZIP)</button>
             <button id="btnRefresh">🔄 Yenile</button>
         </div>
     </header>
@@ -121,8 +124,7 @@
             <div class="panel-header">🤖 Nambır AI Auto-Pilot</div>
             <div class="chat-history" id="chatHistory">
                 <div class="message ai">
-                    Selam Taha kanka! <b>Nambır AI v6.0 Otonom Sürüm</b> hazır. ⚡️<br><br>
-                    Artık sohbet ekranında uzun kodlar göstermeyeceğim. Doğrudan dosya açabilir, klasör oluşturabilir, koda müdahale edip silebilir veya projeyi baştan yazabilirim. Sadece ne istediğini söyle! 🚀
+                    Selam kanka! <b>v6.1 ZIP-Master</b> hazır. Bütün klasör yapısını tek tıkla <b>.ZIP</b> olarak indirebilirsin! 🚀
                 </div>
             </div>
             <div class="chat-input-area">
@@ -157,9 +159,9 @@
                 "src": ["src/style.css", "src/script.js"]
             },
             files: {
-                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v6.0 Auto-Pilot!</h1>\n  <p>Yapay zeka artık projenize tam kontrol erişimine sahip.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
+                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v6.1 ZIP-Master!</h1>\n  <p>Tüm proje klasörleriyle beraber .ZIP formatında indirilebilir.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
                 "src/style.css": `body {\n  background: #111827;\n  color: #a6e22e;\n  font-family: sans-serif;\n  text-align: center;\n  padding-top: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #0e639c;\n  color: white;\n  border: none;\n  border-radius: 5px;\n  cursor: pointer;\n}`,
-                "src/script.js": `function selam() {\n  alert("Nambır AI Projeyi Doğrudan Yönetiyor!");\n}`
+                "src/script.js": `function selam() {\n  alert(".ZIP İndirme Butonu Tamamen Aktif!");\n}`
             }
         };
 
@@ -185,7 +187,7 @@
             }
 
             document.getElementById('btnSaveKey').addEventListener('click', saveApiKey);
-            document.getElementById('btnDownload').addEventListener('click', downloadActiveFile);
+            document.getElementById('btnDownloadZip').addEventListener('click', downloadEntireProjectZip);
             document.getElementById('btnRefresh').addEventListener('click', runPreview);
             document.getElementById('btnAddFolder').addEventListener('click', createNewFolder);
             document.getElementById('btnAddFile').addEventListener('click', createNewFileRoot);
@@ -223,6 +225,26 @@
             updateRefSelect();
         });
 
+        // --- .ZIP İNDİRME FONKSİYONU ---
+        function downloadEntireProjectZip() {
+            if (typeof JSZip === "undefined") {
+                alert("JSZip kütüphanesi yüklenemedi. Lütfen sayfayı yenileyin.");
+                return;
+            }
+
+            const zip = new JSZip();
+
+            // Tüm klasörleri ve dosyaları ZIP içine ekle
+            Object.keys(fileStructure.files).forEach(filepath => {
+                zip.file(filepath, fileStructure.files[filepath]);
+            });
+
+            // ZIP dosyasını oluştur ve indir
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                saveAs(content, "armut-pen-projesi.zip");
+            });
+        }
+
         // --- EDİTÖR & DOSYA İŞLEMLERİ ---
         function updateLineNumbers() {
             const lines = codeEditor.value.split('\n').length;
@@ -245,7 +267,7 @@
             const key = apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem('gemini_api_key', key);
-                alert('API Key Kaydedildi kanka!');
+                alert('API Key Kaydedildi!');
             } else {
                 alert('Lütfen geçerli bir API Key girin!');
             }
@@ -415,15 +437,6 @@
             }
         }
 
-        function downloadActiveFile() {
-            const content = codeEditor.value;
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = activeFile.split('/').pop();
-            a.click();
-        }
-
         function updateRefSelect() {
             refSelect.innerHTML = '<option value="">📎 AI\'ya Odak Dosya Bağla...</option>';
             Object.keys(fileStructure.files).forEach(filepath => {
@@ -453,7 +466,7 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // --- AUTONOMOUS AI ENGINE (YAPAY ZEKA OTONOM YÖNETİMİ) ---
+        // --- AUTONOMOUS AI ENGINE ---
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const prompt = input.value.trim();
@@ -465,32 +478,27 @@
             addMessage(prompt, 'user');
             input.value = '';
 
-            addMessage('⚡️ Nambır AI Otonom Modda Çalışıyor ve Kod Düzenliyor...', 'ai');
+            addMessage('⚡️ Nambır AI Kod Düzenliyor...', 'ai');
             const loadingMsg = document.getElementById('chatHistory').lastChild;
 
             try {
-                // Yapay Zekaya Sistem Yetkilerini ve Formatı Öğretme
                 const systemPrompt = `
-Sen "Nambır AI Auto-Pilot" otonom geliştirme asistanısın. Kullanıcı ile sohbet ederken KESİNLİKLE chat alanına kod yazmayacaksın.
-Sen doğrudan projenin yapısını, dosyalarını ve kodlarını kontrol etme yetkisine sahipsin.
+Sen "Nambır AI Auto-Pilot" otonom geliştirme asistanısın. KESİNLİKLE sohbet alanına kod yazmayacaksın.
+Doğrudan projenin yapısını, dosyalarını ve kodlarını kontrol ediyorsun.
 
 MEVCUT PROJE YAPISI:
 ${JSON.stringify(fileStructure, null, 2)}
 
-ŞU ANKİ AKTİF DOSYA: ${activeFile}
+AKTİF DOSYA: ${activeFile}
+KULLANICI İSTEĞİ: "${prompt}"
 
-KULLANICININ İSTEĞİ: "${prompt}"
-
-CEVAP VERİRKEN SADECE VE SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER. BAŞKA HİÇBİR AÇIKLAMA VEYA METİN YAZMA!
-
-JSON Formatı Örneği:
+SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER:
 {
-  "summary": "İşlem hakkında kullanıcıya kısa Türkçe açıklama (örn: index.html ve style.css güncellendi, yeni klasör oluşturuldu)",
+  "summary": "Kısa Türkçe açıklama",
   "createFolders": ["yeni_klasor_adi"],
-  "deleteItems": ["silinecek_dosya_veya_klasor_yolu"],
+  "deleteItems": ["silinecek_yol"],
   "updateFiles": {
-    "index.html": "güncellenmiş tam kod...",
-    "src/yeni_dosya.js": "yeni dosyanın tam kodu..."
+    "index.html": "tam kod..."
   }
 }
                 `;
@@ -510,33 +518,26 @@ JSON Formatı Örneği:
 
                 if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
                     let rawReply = data.candidates[0].content.parts[0].text;
-                    
-                    // JSON Bloğunu Ayıkla
                     rawReply = rawReply.replace(/```json/g, '').replace(/```/g, '').trim();
                     
                     try {
                         const aiAction = JSON.parse(rawReply);
                         
-                        // 1. Klasörleri Oluştur
                         if (aiAction.createFolders && Array.isArray(aiAction.createFolders)) {
                             aiAction.createFolders.forEach(fol => {
                                 if (!fileStructure.folders[fol]) fileStructure.folders[fol] = [];
                             });
                         }
 
-                        // 2. Silinecek Öğe Varsa Sil
                         if (aiAction.deleteItems && Array.isArray(aiAction.deleteItems)) {
                             aiAction.deleteItems.forEach(item => {
                                 deleteItem(item, !!fileStructure.folders[item]);
                             });
                         }
 
-                        // 3. Dosyaları Güncelle / Yeni Dosya Ekle
                         if (aiAction.updateFiles) {
                             Object.keys(aiAction.updateFiles).forEach(filepath => {
                                 fileStructure.files[filepath] = aiAction.updateFiles[filepath];
-                                
-                                // Dosya bir klasör altındaysa ve klasör kaydı yoksa bağla
                                 if (filepath.includes('/')) {
                                     const folName = filepath.split('/')[0];
                                     if (!fileStructure.folders[folName]) fileStructure.folders[folName] = [];
@@ -547,7 +548,6 @@ JSON Formatı Örneği:
                             });
                         }
 
-                        // Değişiklikleri Tam Kaydet ve Görünümleri Yenile
                         saveAndRefresh();
                         if (aiAction.updateFiles && aiAction.updateFiles[activeFile] !== undefined) {
                             codeEditor.value = fileStructure.files[activeFile];
@@ -557,7 +557,7 @@ JSON Formatı Örneği:
                         loadingMsg.innerHTML = `✅ <b>İşlem Tamamlandı:</b> ${aiAction.summary || 'Proje güncellendi.'}`;
 
                     } catch(jsonErr) {
-                        loadingMsg.innerText = `⚠️ Yapay Zeka Format Hatası: Değişiklikler uygulanamadı. Lütfen tekrar deneyin.`;
+                        loadingMsg.innerText = `⚠️ Yapay Zeka Format Hatası. Lütfen tekrar deneyin.`;
                     }
 
                 } else {
