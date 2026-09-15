@@ -3,89 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen - Yapay Zeka Destekli Web Tabanlı Kod Editörü</title>
-    <meta name="description" content="Armut Pen, Nambır AI otonom asistanı ve ZIP indirme özellikleriyle donatılmış, web tabanlı gelişmiş bir kod editörü ve geliştirme stüdyosudur.">
-    <!-- Dahili JSZip ve FileSaver Bağlantıları (Güvenli & Kilitlenmesiz) -->
+    <title>Armut Pen v7.0 - Professional Code Editor</title>
+    <meta name="description" content="Armut Pen v7.0 - Multi-language code editor with AI, media player, syntax highlighting, and more.">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #1e1e1e; color: #d4d4d4; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        html { --primary: #0e639c; --success: #28a745; --danger: #ff5555; --bg-dark: #1e1e1e; --bg-light: #252526; --text: #d4d4d4; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--bg-dark); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
         /* HEADER */
-        header { background-color: #252526; padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; height: 45px; }
-        .logo { font-weight: bold; font-size: 15px; color: #a6e22e; display: flex; align-items: center; gap: 8px; }
-        .actions { display: flex; gap: 8px; align-items: center; }
-        input[type="text"], input[type="password"], select { background-color: #3c3c3c; border: 1px solid #555; color: white; padding: 5px 8px; border-radius: 4px; font-size: 12px; outline: none; }
-        button { background-color: #0e639c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: background 0.2s; }
+        header { background-color: var(--bg-light); padding: 0 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; height: 45px; gap: 10px; }
+        .logo { font-weight: bold; font-size: 14px; color: #a6e22e; display: flex; align-items: center; gap: 6px; }
+        .logo span { font-size: 9px; background: #3c3c3c; color: #a6e22e; padding: 2px 5px; border-radius: 3px; }
+        .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        input[type="text"], input[type="password"], input[type="file"], select { background-color: #3c3c3c; border: 1px solid #555; color: white; padding: 5px 8px; border-radius: 4px; font-size: 11px; outline: none; }
+        input[type="file"] { display: none; }
+        button { background-color: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 11px; transition: all 0.2s; white-space: nowrap; }
         button:hover { background-color: #1177bb; }
         button.secondary { background-color: #3c3c3c; }
         button.secondary:hover { background-color: #505050; }
-        button.success { background-color: #28a745; }
+        button.success { background-color: var(--success); }
         button.success:hover { background-color: #218838; }
+        button.danger { background-color: var(--danger); }
+        button.danger:hover { background-color: #dd3333; }
 
         /* WORKSPACE */
         .workspace { display: flex; flex: 1; height: calc(100vh - 45px); }
         
-        /* SIDEBAR (GEZGİN) */
-        #sidebar { width: 230px; background-color: #252526; border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; user-select: none; }
-        .sidebar-header { padding: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .tree-actions { display: flex; gap: 4px; }
+        /* SIDEBAR */
+        #sidebar { width: 220px; background-color: var(--bg-light); border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; user-select: none; }
+        .sidebar-header { padding: 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #888; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3c3c3c; }
+        .tree-actions { display: flex; gap: 3px; }
         .file-tree { flex: 1; overflow-y: auto; padding: 5px 0; }
-        
-        .tree-item { padding: 6px 12px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #cccccc; }
+        .search-box { padding: 6px; border-bottom: 1px solid #3c3c3c; }
+        .search-box input { width: 100%; }
+        .tree-item { padding: 5px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #cccccc; user-select: none; }
         .tree-item:hover { background-color: #2a2d2e; }
-        .tree-item.active { background-color: #37373d; color: #fff; border-left: 3px solid #0e639c; }
+        .tree-item.active { background-color: #37373d; color: #fff; border-left: 3px solid var(--primary); }
         .tree-item.folder { font-weight: bold; color: #e8a838; }
-        .tree-item .del-btn { display: none; color: #ff5555; font-size: 11px; font-weight: bold; padding: 2px 4px; }
+        .tree-item .del-btn { display: none; color: var(--danger); font-size: 10px; font-weight: bold; padding: 2px 4px; }
         .tree-item:hover .del-btn { display: inline; }
-        .tree-item .add-file-btn { display: none; color: #a6e22e; font-size: 11px; font-weight: bold; margin-right: 6px; }
+        .tree-item .add-file-btn { display: none; color: #a6e22e; font-size: 10px; font-weight: bold; margin-right: 4px; }
         .tree-item.folder:hover .add-file-btn { display: inline; }
-        .folder-children { padding-left: 15px; }
+        .folder-children { padding-left: 12px; }
+        .file-icon { margin-right: 4px; }
 
         /* EDITOR PANEL */
-        #editor-panel { flex: 1.2; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background-color: #1e1e1e; }
+        #editor-panel { flex: 1.3; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background-color: var(--bg-dark); }
         .tabs { background-color: #2d2d2d; display: flex; overflow-x: auto; border-bottom: 1px solid #3c3c3c; }
-        .tab { padding: 8px 14px; font-size: 12px; background: #2d2d2d; color: #969696; border-right: 1px solid #252526; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .tab.active { background: #1e1e1e; color: #fff; border-top: 2px solid #0e639c; }
+        .tab { padding: 7px 12px; font-size: 11px; background: #2d2d2d; color: #969696; border-right: 1px solid #252526; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .tab.active { background: var(--bg-dark); color: #fff; border-top: 2px solid var(--primary); }
+        .tab .close-tab { cursor: pointer; margin-left: 4px; }
+
+        .editor-wrapper { flex: 1; display: flex; background: var(--bg-dark); overflow: hidden; position: relative; }
+        .line-numbers { width: 45px; background-color: var(--bg-dark); color: #858585; text-align: right; padding: 10px 6px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; overflow: hidden; border-right: 1px solid #3c3c3c; }
         
-        /* EDITOR TEXTAREA & LINE NUMBERS */
-        .editor-wrapper { flex: 1; display: flex; background: #1e1e1e; overflow: hidden; position: relative; }
-        .line-numbers { width: 40px; background-color: #1e1e1e; color: #858585; text-align: right; padding: 10px 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.5; border-right: 1px solid #333; user-select: none; }
-        textarea#codeEditor { flex: 1; background: #1e1e1e; color: #d4d4d4; border: none; outline: none; padding: 10px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.5; resize: none; tab-size: 2; white-space: pre; overflow: auto; }
+        .code-editor-wrapper { flex: 1; position: relative; overflow: hidden; }
+        textarea#codeEditor { flex: 1; width: 100%; height: 100%; background: var(--bg-dark); color: var(--text); border: none; outline: none; padding: 10px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; resize: none; position: absolute; top: 0; left: 0; z-index: 2; background: transparent; color: transparent; caret-color: white; }
+        #codeHighlight { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 10px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; overflow: hidden; pointer-events: none; white-space: pre; word-wrap: break-word; }
+        #codeHighlight code { background: none; padding: 0; }
+
+        .console-panel { height: 120px; background-color: #1a1a1a; border-top: 1px solid #3c3c3c; overflow-y: auto; padding: 8px; font-size: 11px; font-family: 'Courier New', monospace; }
+        .console-log { color: #d4d4d4; padding: 2px 0; }
+        .console-error { color: #ff5555; }
+        .console-warn { color: #ffd700; }
+        .console-info { color: #4ec9b0; }
 
         /* PREVIEW PANEL */
         #preview-panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #3c3c3c; background: #ffffff; }
-        .panel-header { background-color: #2d2d2d; padding: 6px 12px; font-size: 12px; font-weight: bold; color: #aaa; border-bottom: 1px solid #3c3c3c; display: flex; justify-content: space-between; align-items: center; }
-        iframe { flex: 1; width: 100%; height: 100%; border: none; background: #ffffff; }
+        .panel-header { background-color: #2d2d2d; padding: 6px 12px; font-size: 11px; font-weight: bold; color: #aaa; border-bottom: 1px solid #3c3c3c; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        #preview-container { flex: 1; overflow: auto; }
+        #preview-frame { width: 100%; height: 100%; border: none; background: #ffffff; }
+        
+        .media-player { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-dark); }
+        .media-player audio, .media-player video { width: 90%; max-height: 90%; margin: 20px auto; }
+        .media-viewer { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: auto; background: var(--bg-dark); }
+        .media-viewer img { max-width: 100%; max-height: 100%; }
+        .file-info { color: var(--text); text-align: center; padding: 20px; }
 
         /* FULLSCREEN MODAL */
         #fullscreen-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; flex-direction: column; }
         #fullscreen-modal.active { display: flex; }
-        #fullscreen-modal .fs-header { background: #252526; padding: 10px 15px; display: flex; justify-content: space-between; color: white; align-items: center; }
+        #fullscreen-modal .fs-header { background: var(--bg-light); padding: 10px 15px; display: flex; justify-content: space-between; color: white; align-items: center; }
 
         /* AI PANEL */
-        #ai-panel { width: 320px; background-color: #252526; display: flex; flex-direction: column; }
-        .chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 8px 12px; border-radius: 6px; font-size: 12px; max-width: 90%; line-height: 1.4; word-wrap: break-word; }
-        .message.user { background-color: #0e639c; color: white; align-self: flex-end; }
-        .message.ai { background-color: #333333; color: #d4d4d4; align-self: flex-start; border: 1px solid #444; }
-        
-        .chat-input-area { padding: 10px; background-color: #1e1e1e; border-top: 1px solid #3c3c3c; display: flex; flex-direction: column; gap: 8px; }
-        .ref-file-box { font-size: 11px; color: #a6e22e; display: flex; align-items: center; justify-content: space-between; background: #252526; padding: 4px 8px; border-radius: 4px; display: none; }
+        #ai-panel { width: 300px; background-color: var(--bg-light); display: flex; flex-direction: column; border-left: 1px solid #3c3c3c; }
+        .panel-header { background-color: #2d2d2d; padding: 8px 12px; font-size: 11px; font-weight: bold; color: #aaa; border-bottom: 1px solid #3c3c3c; }
+        .chat-history { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { padding: 8px 10px; border-radius: 6px; font-size: 11px; max-width: 90%; line-height: 1.4; word-wrap: break-word; }
+        .message.user { background-color: var(--primary); color: white; align-self: flex-end; }
+        .message.ai { background-color: #333333; color: var(--text); align-self: flex-start; border: 1px solid #444; }
+        .chat-input-area { padding: 8px; background-color: var(--bg-dark); border-top: 1px solid #3c3c3c; display: flex; flex-direction: column; gap: 6px; }
+        .ref-file-box { font-size: 10px; color: #a6e22e; display: flex; align-items: center; justify-content: space-between; background: var(--bg-light); padding: 4px 8px; border-radius: 3px; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: var(--bg-light); padding: 20px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { font-size: 14px; font-weight: bold; margin-bottom: 15px; color: var(--text); }
+        .modal-body { margin-bottom: 15px; }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+        .modal-body input, .modal-body textarea { width: 100%; padding: 8px; margin: 5px 0; background: #3c3c3c; border: 1px solid #555; color: white; border-radius: 4px; }
+
+        /* THEMES */
+        body.light-theme { --bg-dark: #f5f5f5; --bg-light: #ffffff; --text: #333333; }
+        body.light-theme .search-box input { background: #e0e0e0; color: #333; border: 1px solid #999; }
+        body.light-theme textarea#codeEditor { color: transparent; }
+        body.light-theme #codeHighlight { color: #333; background: #f5f5f5; }
+        body.light-theme .modal-content { background: #ffffff; }
+        body.light-theme .modal-body input, body.light-theme .modal-body textarea { background: #e0e0e0; color: #333; border: 1px solid #999; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo">
-            🍐 Armut Pen <span style="font-size: 10px; background: #3c3c3c; color: #a6e22e; padding: 2px 6px; border-radius: 4px;">v6.1 ZIP-Master</span>
+            🍐 Armut Pen <span>v7.0 Pro</span>
         </div>
         <div class="actions">
-            <input type="password" id="apiKeyInput" placeholder="Gemini API Key...">
-            <button class="secondary" id="btnSaveKey">Key Kaydet</button>
-            <button class="success" id="btnDownloadZip">📦 Tüm Projeyi İndir (.ZIP)</button>
-            <button id="btnRefresh">🔄 Yenile</button>
+            <input type="password" id="apiKeyInput" placeholder="Gemini API Key" title="Gemini API Anahtarı">
+            <button class="secondary" id="btnSaveKey" title="API Anahtarını Kaydet">💾 Key</button>
+            <input type="file" id="fileImport" accept=".zip,.rar,.html,.css,.js,.py,.java,.c,.cpp,.go,.rs,.json,.mp3,.mp4,.wav,.m4a,.png,.jpg,.jpeg,.txt" multiple>
+            <button class="secondary" id="btnImport" title="Dosya Yükle">📂 İçe Aktar</button>
+            <button class="success" id="btnDownloadZip" title="Projeyi ZIP olarak indir">📦 ZIP İndir</button>
+            <button class="secondary" id="btnFindReplace" title="Ara ve Değiştir">🔍 Ara/Değiştir</button>
+            <button class="secondary" id="btnTheme" title="Tema Değiştir">🌙 Tema</button>
+            <button id="btnRefresh" title="Önizlemeyi Yenile">🔄</button>
         </div>
     </header>
 
@@ -93,11 +145,14 @@
         <!-- SIDEBAR -->
         <div id="sidebar">
             <div class="sidebar-header">
-                <span>GEZGİN</span>
+                <span>📁 DOSYALAR</span>
                 <div class="tree-actions">
-                    <button style="padding:2px 5px; font-size:10px;" id="btnAddFolder">+ Klasör</button>
-                    <button style="padding:2px 5px; font-size:10px;" id="btnAddFile">+ Dosya</button>
+                    <button style="padding:2px 4px; font-size:9px;" id="btnAddFolder" title="Klasör Ekle">📁+</button>
+                    <button style="padding:2px 4px; font-size:9px;" id="btnAddFile" title="Dosya Ekle">📄+</button>
                 </div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchFiles" placeholder="Dosyalarda ara..." spellcheck="false">
             </div>
             <div class="file-tree" id="fileTree"></div>
         </div>
@@ -107,38 +162,44 @@
             <div class="tabs" id="tabsHeader"></div>
             <div class="editor-wrapper">
                 <div class="line-numbers" id="lineNumbers">1</div>
-                <textarea id="codeEditor" spellcheck="false"></textarea>
+                <div class="code-editor-wrapper">
+                    <textarea id="codeEditor" spellcheck="false"></textarea>
+                    <pre id="codeHighlight"><code id="highlightCode"></code></pre>
+                </div>
             </div>
+            <div class="console-panel" id="consolePanel"></div>
         </div>
 
         <!-- PREVIEW PANEL -->
         <div id="preview-panel">
             <div class="panel-header">
-                <span>Canlı Önizleme</span>
-                <button class="secondary" style="font-size: 11px;" id="btnFullscreen">⛶ Tam Ekran Gör</button>
+                <span id="previewTitle">🌐 Canlı Önizleme</span>
+                <button class="secondary" style="font-size: 10px;" id="btnFullscreen" title="Tam Ekran Gör">⛶ Tam Ekran</button>
             </div>
-            <iframe id="preview-frame"></iframe>
+            <div id="preview-container">
+                <iframe id="preview-frame"></iframe>
+            </div>
         </div>
 
         <!-- AI PANEL -->
         <div id="ai-panel">
-            <div class="panel-header">🤖 Nambır AI Auto-Pilot</div>
+            <div class="panel-header">🤖 Nambır AI (Sahip)</div>
             <div class="chat-history" id="chatHistory">
                 <div class="message ai">
-                    Selam kanka! <b>v6.1 ZIP-Master</b> hazır. Bütün klasör yapısını tek tıkla <b>.ZIP</b> olarak indirebilirsin! 🚀
+                    Selam kanka! <b>v7.0 Pro</b> hazır. Tüm dilleri destekliyorum. 🚀
                 </div>
             </div>
             <div class="chat-input-area">
-                <div id="refFileBox" class="ref-file-box">
+                <div id="refFileBox" class="ref-file-box" style="display:none;">
                     <span id="refFileName">📄 Referans: Yok</span>
                     <span style="cursor:pointer; color:#ff5555;" id="btnClearRef">✖</span>
                 </div>
-                <select id="refSelect">
-                    <option value="">📎 AI'ya Odak Dosya Bağla...</option>
+                <select id="refSelect" style="font-size: 10px;">
+                    <option value="">📎 Dosya Bağla...</option>
                 </select>
-                <div style="display:flex; gap:6px;">
-                    <input type="text" id="userInput" placeholder="Otonom AI'ya Talimat Ver..." style="flex:1;">
-                    <button id="btnSendAi">Gönder</button>
+                <div style="display:flex; gap:4px;">
+                    <input type="text" id="userInput" placeholder="AI'ya talimat ver..." style="flex:1; font-size: 10px;">
+                    <button id="btnSendAi" style="padding: 5px 8px;">Gönder</button>
                 </div>
             </div>
         </div>
@@ -147,46 +208,83 @@
     <!-- FULLSCREEN MODAL -->
     <div id="fullscreen-modal">
         <div class="fs-header">
-            <span>🌐 Canlı Tam Ekran Önizleme</span>
+            <span>🌐 Tam Ekran Önizleme</span>
             <button class="secondary" id="btnCloseFs">❌ Kapat</button>
         </div>
-        <iframe id="fs-preview-frame"></iframe>
+        <iframe id="fs-preview-frame" style="flex:1; width:100%; border:none;"></iframe>
+    </div>
+
+    <!-- FIND & REPLACE MODAL -->
+    <div id="findReplaceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">🔍 Ara ve Değiştir</div>
+            <div class="modal-body">
+                <input type="text" id="searchInput" placeholder="Aranan metni yaz..." spellcheck="false">
+                <input type="text" id="replaceInput" placeholder="Yerine yazacak metni yaz..." spellcheck="false">
+            </div>
+            <div class="modal-footer">
+                <button id="btnFindAll">Tümünü Bul</button>
+                <button id="btnReplaceAll">Tümünü Değiştir</button>
+                <button class="secondary" id="btnCloseFindReplace">Kapat</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- SİSTEM DEĞİŞKENLERİ ---
+        // ===== LANGUAGE & FILE TYPE DETECTION =====
+        const LANGUAGE_MAP = {
+            'html': 'html', 'css': 'css', 'js': 'javascript', 'json': 'json',
+            'py': 'python', 'java': 'java', 'c': 'c', 'cpp': 'cpp', 'cc': 'cpp', 'cxx': 'cpp',
+            'go': 'go', 'rs': 'rust', 'txt': 'plaintext'
+        };
+
+        const MEDIA_TYPES = {
+            'mp3': 'audio', 'wav': 'audio', 'm4a': 'audio',
+            'mp4': 'video', 'webm': 'video', 'mov': 'video', 'avi': 'video',
+            'png': 'image', 'jpg': 'image', 'jpeg': 'image', 'gif': 'image', 'webp': 'image', 'svg': 'image'
+        };
+
+        const BINARY_TYPES = ['zip', 'rar', 'exe', 'apk', 'xapk', 'ipa', 'aab', '7z', 'tar', 'gz'];
+
+        // ===== SYSTEM VARIABLES =====
         let fileStructure = {
-            folders: {
-                "src": ["src/style.css", "src/script.js"]
-            },
+            folders: { "src": ["src/style.css", "src/script.js"] },
             files: {
-                "index.html": `<!DOCTYPE html>\n<html>\n<head>\n  <link rel="stylesheet" href="src/style.css">\n</head>\n<body>\n  <h1>🍐 Armut Pen v6.1 ZIP-Master!</h1>\n  <p>Tüm proje klasörleriyle beraber .ZIP formatında indirilebilir.</p>\n  <button onclick="selam()">Tıkla Kanka</button>\n  <script src="src/script.js"><\/script>\n</body>\n</html>`,
-                "src/style.css": `body {\n  background: #111827;\n  color: #a6e22e;\n  font-family: sans-serif;\n  text-align: center;\n  padding-top: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #0e639c;\n  color: white;\n  border: none;\n  border-radius: 5px;\n  cursor: pointer;\n}`,
-                "src/script.js": `function selam() {\n  alert(".ZIP İndirme Butonu Tamamen Aktif!");\n}`
+                "index.html": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset='UTF-8'>\n  <link rel='stylesheet' href='src/style.css'>\n</head>\n<body>\n  <h1>🍐 Armut Pen v7.0</h1>\n  <p>Tüm diller desteklendi!</p>\n  <button onclick='selam()'>Tıkla</button>\n  <script src='src/script.js'><\/script>\n</body>\n</html>",
+                "src/style.css": "body {\n  background: #1e1e1e;\n  color: #a6e22e;\n  font-family: Arial, sans-serif;\n  text-align: center;\n  padding: 50px;\n}\nbutton {\n  padding: 10px 20px;\n  background: #0e639c;\n  color: white;\n  border: none;\n  border-radius: 4px;\n  cursor: pointer;\n  font-weight: bold;\n}\nbutton:hover { background: #1177bb; }",
+                "src/script.js": "function selam() {\n  alert('Armut Pen v7.0 Tamamen Aktif!');\n  console.log('JavaScript Çalışıyor!');\n}"
             }
         };
 
         let activeFile = "index.html";
         let referenceFile = null;
+        let isDarkTheme = true;
+        let consoleLogs = [];
 
-        // --- DOM ELEMANLARI ---
+        // ===== DOM ELEMENTS =====
         const codeEditor = document.getElementById('codeEditor');
+        const codeHighlight = document.getElementById('highlightCode');
         const lineNumbers = document.getElementById('lineNumbers');
         const fileTree = document.getElementById('fileTree');
         const tabsHeader = document.getElementById('tabsHeader');
         const refSelect = document.getElementById('refSelect');
         const apiKeyInput = document.getElementById('apiKeyInput');
+        const consolePanel = document.getElementById('consolePanel');
+        const previewContainer = document.getElementById('preview-container');
+        const previewFrame = document.getElementById('preview-frame');
 
-        // --- SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KISIM ---
+        // ===== INITIALIZATION =====
         window.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) apiKeyInput.value = savedKey;
 
-            const savedStruct = localStorage.getItem('armut_v6_struct');
-            if (savedStruct) {
-                try { fileStructure = JSON.parse(savedStruct); } catch(e){}
-            }
+            const savedStruct = localStorage.getItem('armut_v7_struct');
+            if (savedStruct) try { fileStructure = JSON.parse(savedStruct); } catch(e){}
 
+            const savedTheme = localStorage.getItem('armut_theme');
+            if (savedTheme === 'light') toggleTheme();
+
+            // Event Listeners
             document.getElementById('btnSaveKey').addEventListener('click', saveApiKey);
             document.getElementById('btnDownloadZip').addEventListener('click', downloadEntireProjectZip);
             document.getElementById('btnRefresh').addEventListener('click', runPreview);
@@ -196,19 +294,30 @@
             document.getElementById('btnCloseFs').addEventListener('click', () => toggleFullscreen(false));
             document.getElementById('btnSendAi').addEventListener('click', sendMessage);
             document.getElementById('btnClearRef').addEventListener('click', clearReference);
-            
+            document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileImport').click());
+            document.getElementById('fileImport').addEventListener('change', handleImport);
+            document.getElementById('btnTheme').addEventListener('click', toggleTheme);
+            document.getElementById('btnFindReplace').addEventListener('click', () => toggleFindReplace(true));
+            document.getElementById('btnCloseFindReplace').addEventListener('click', () => toggleFindReplace(false));
+            document.getElementById('btnFindAll').addEventListener('click', findAll);
+            document.getElementById('btnReplaceAll').addEventListener('click', replaceAll);
+            document.getElementById('searchFiles').addEventListener('input', filterFileTree);
+
             userInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') sendMessage(); });
             refSelect.addEventListener('change', (e) => setReferenceFile(e.target.value));
 
             codeEditor.addEventListener('input', () => {
                 fileStructure.files[activeFile] = codeEditor.value;
-                localStorage.setItem('armut_v6_struct', JSON.stringify(fileStructure));
+                localStorage.setItem('armut_v7_struct', JSON.stringify(fileStructure));
                 updateLineNumbers();
+                highlightCode();
                 runPreview();
             });
 
             codeEditor.addEventListener('scroll', () => {
                 lineNumbers.scrollTop = codeEditor.scrollTop;
+                document.getElementById('codeHighlight').scrollTop = codeEditor.scrollTop;
+                document.getElementById('codeHighlight').scrollLeft = codeEditor.scrollLeft;
             });
 
             codeEditor.addEventListener('keydown', (e) => {
@@ -218,35 +327,168 @@
                     const end = codeEditor.selectionEnd;
                     codeEditor.value = codeEditor.value.substring(0, start) + "  " + codeEditor.value.substring(end);
                     codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+                    codeEditor.dispatchEvent(new Event('input'));
+                }
+                // Ctrl+S
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveApiKey();
+                }
+                // Ctrl+F
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    toggleFindReplace(true);
                 }
             });
 
             openFile(activeFile);
             updateFileTree();
             updateRefSelect();
+            setupConsoleInterception();
         });
 
-        // --- .ZIP İNDİRME FONKSİYONU ---
-        function downloadEntireProjectZip() {
-            if (typeof JSZip === "undefined") {
-                alert("JSZip kütüphanesi yüklenemedi. Lütfen sayfayı yenileyin.");
-                return;
+        // ===== CONSOLE INTERCEPTION =====
+        function setupConsoleInterception() {
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            const originalInfo = console.info;
+
+            console.log = function(...args) {
+                consoleLogs.push({ type: 'log', content: args.join(' ') });
+                updateConsolePanel();
+                originalLog.apply(console, args);
+            };
+            console.error = function(...args) {
+                consoleLogs.push({ type: 'error', content: args.join(' ') });
+                updateConsolePanel();
+                originalError.apply(console, args);
+            };
+            console.warn = function(...args) {
+                consoleLogs.push({ type: 'warn', content: args.join(' ') });
+                updateConsolePanel();
+                originalWarn.apply(console, args);
+            };
+            console.info = function(...args) {
+                consoleLogs.push({ type: 'info', content: args.join(' ') });
+                updateConsolePanel();
+                originalInfo.apply(console, args);
+            };
+        }
+
+        function updateConsolePanel() {
+            consolePanel.innerHTML = consoleLogs.map(log => 
+                `<div class="console-log console-${log.type}">${escapeHtml(log.content)}</div>`
+            ).join('');
+            consolePanel.scrollTop = consolePanel.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== SYNTAX HIGHLIGHTING =====
+        function highlightCode() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            const lang = LANGUAGE_MAP[ext] || 'plaintext';
+            codeHighlight.textContent = codeEditor.value;
+            codeHighlight.className = `language-${lang}`;
+            hljs.highlightElement(codeHighlight);
+        }
+
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            document.body.classList.toggle('light-theme', !isDarkTheme);
+            localStorage.setItem('armut_theme', isDarkTheme ? 'dark' : 'light');
+        }
+
+        // ===== FIND & REPLACE =====
+        function toggleFindReplace(show) {
+            document.getElementById('findReplaceModal').classList.toggle('active', show);
+            if (show) document.getElementById('searchInput').focus();
+        }
+
+        function findAll() {
+            const search = document.getElementById('searchInput').value;
+            if (!search) return alert('Aranan metni gir!');
+            const regex = new RegExp(search, 'g');
+            const matches = (codeEditor.value.match(regex) || []).length;
+            alert(`${matches} eşleşme bulundu.`);
+        }
+
+        function replaceAll() {
+            const search = document.getElementById('searchInput').value;
+            const replace = document.getElementById('replaceInput').value;
+            if (!search) return alert('Aranan metni gir!');
+            codeEditor.value = codeEditor.value.replaceAll(search, replace);
+            fileStructure.files[activeFile] = codeEditor.value;
+            localStorage.setItem('armut_v7_struct', JSON.stringify(fileStructure));
+            updateLineNumbers();
+            highlightCode();
+            runPreview();
+        }
+
+        // ===== FILE IMPORT =====
+        async function handleImport(e) {
+            for (const file of e.target.files) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                if (BINARY_TYPES.includes(ext)) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const data = event.target.result;
+                        fileStructure.files[file.name] = `[Binary: ${ext.toUpperCase()}] - ${file.size} bytes`;
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else if (ext === 'zip') {
+                    const jsZip = new JSZip();
+                    const zip = await jsZip.loadAsync(file);
+                    for (const [path, zipFile] of Object.entries(zip.files)) {
+                        if (!zipFile.dir) {
+                            const content = await zipFile.async('string');
+                            fileStructure.files[path] = content;
+                            const folder = path.split('/').slice(0, -1).join('/');
+                            if (folder && !fileStructure.folders[folder]) fileStructure.folders[folder] = [];
+                            if (folder) fileStructure.folders[folder].push(path);
+                        }
+                    }
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        fileStructure.files[file.name] = event.target.result;
+                    };
+                    reader.readAsText(file);
+                }
             }
+            saveAndRefresh();
+            document.getElementById('fileImport').value = '';
+        }
 
-            const zip = new JSZip();
-
-            // Tüm klasörleri ve dosyaları ZIP içine ekle
-            Object.keys(fileStructure.files).forEach(filepath => {
-                zip.file(filepath, fileStructure.files[filepath]);
-            });
-
-            // ZIP dosyasını oluştur ve indir
-            zip.generateAsync({ type: "blob" }).then(function(content) {
-                saveAs(content, "armut-pen-projesi.zip");
+        // ===== FILE TREE FILTER =====
+        function filterFileTree() {
+            const query = document.getElementById('searchFiles').value.toLowerCase();
+            document.querySelectorAll('.tree-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(query) ? '' : 'none';
             });
         }
 
-        // --- EDİTÖR & DOSYA İŞLEMLERİ ---
+        // ===== ZIP DOWNLOAD =====
+        function downloadEntireProjectZip() {
+            if (typeof JSZip === "undefined") return alert("JSZip yüklenemedi!");
+            const zip = new JSZip();
+            Object.keys(fileStructure.files).forEach(filepath => {
+                zip.file(filepath, fileStructure.files[filepath]);
+            });
+            zip.generateAsync({ type: "blob" }).then(content => {
+                saveAs(content, "armut-pen-proje.zip");
+            });
+        }
+
+        // ===== LINE NUMBERS =====
         function updateLineNumbers() {
             const lines = codeEditor.value.split('\n').length;
             let linesStr = '';
@@ -254,13 +496,16 @@
             lineNumbers.innerHTML = linesStr;
         }
 
+        // ===== FILE OPERATIONS =====
         function openFile(filepath) {
             if (fileStructure.files[filepath] === undefined) return;
             activeFile = filepath;
             codeEditor.value = fileStructure.files[filepath];
             updateLineNumbers();
+            highlightCode();
             renderTabs();
             updateFileTree();
+            updateMediaPreview();
             runPreview();
         }
 
@@ -277,20 +522,20 @@
         function createNewFolder() {
             const folderName = prompt("Yeni Klasör Adı:");
             if (!folderName) return;
-            if (fileStructure.folders[folderName]) { alert("Bu klasör var!"); return; }
+            if (fileStructure.folders[folderName]) { alert("Bu klasör zaten var!"); return; }
             fileStructure.folders[folderName] = [];
             saveAndRefresh();
         }
 
         function createNewFileRoot() {
-            const fileName = prompt("Kök Dizine Dosya Adı (Örn: script.js):");
+            const fileName = prompt("Dosya Adı (örn: script.js):");
             if (!fileName) return;
             addFileToSystem(fileName);
         }
 
         function createNewFileInFolder(folderName, e) {
             if(e) e.stopPropagation();
-            const fileName = prompt(`[${folderName}] Klasörüne Eklenecek Dosya Adı:`);
+            const fileName = prompt(`[${folderName}] klasörüne dosya adı:`);
             if (!fileName) return;
             const fullPath = `${folderName}/${fileName}`;
             if (!fileStructure.folders[folderName]) fileStructure.folders[folderName] = [];
@@ -307,6 +552,7 @@
 
         function deleteItem(path, isFolder, e) {
             if(e) e.stopPropagation();
+            if (!confirm(`${isFolder ? 'Klasörü' : 'Dosyayı'} silmek istediğine emin misin?`)) return;
             if (isFolder) {
                 (fileStructure.folders[path] || []).forEach(f => delete fileStructure.files[f]);
                 delete fileStructure.folders[path];
@@ -322,11 +568,24 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('armut_v6_struct', JSON.stringify(fileStructure));
+            localStorage.setItem('armut_v7_struct', JSON.stringify(fileStructure));
             updateFileTree();
             updateRefSelect();
             renderTabs();
             runPreview();
+        }
+
+        // ===== FILE TREE =====
+        function getFileIcon(filepath) {
+            const ext = filepath.split('.').pop().toLowerCase();
+            const icons = {
+                'html': '🌐', 'css': '🎨', 'js': '⚙️', 'json': '📋',
+                'py': '🐍', 'java': '☕', 'c': 'C️', 'cpp': '⚡', 'go': '🐹', 'rs': '🦀',
+                'mp3': '🎵', 'mp4': '🎬', 'wav': '🔊', 'm4a': '🎶',
+                'png': '🖼️', 'jpg': '📸', 'jpeg': '📸', 'gif': '🎞️',
+                'zip': '📦', 'rar': '📦', 'exe': '⚙️', 'apk': '📱'
+            };
+            return icons[ext] || '📄';
         }
 
         function updateFileTree() {
@@ -336,9 +595,9 @@
                 const fDiv = document.createElement('div');
                 fDiv.className = 'tree-item folder';
                 fDiv.innerHTML = `
-                    <span>📁 ${folder}</span>
+                    <span><span class="file-icon">📁</span>${folder}</span>
                     <div>
-                        <span class="add-file-btn" data-folder="${folder}">+ Dosya</span>
+                        <span class="add-file-btn" data-folder="${folder}">➕</span>
                         <span class="del-btn" data-del-folder="${folder}">✖</span>
                     </div>
                 `;
@@ -350,7 +609,7 @@
                     const cDiv = document.createElement('div');
                     cDiv.className = `tree-item ${cPath === activeFile ? 'active' : ''}`;
                     cDiv.innerHTML = `
-                        <span>📄 ${cPath.split('/').pop()}</span>
+                        <span><span class="file-icon">${getFileIcon(cPath)}</span>${cPath.split('/').pop()}</span>
                         <span class="del-btn" data-del-file="${cPath}">✖</span>
                     `;
                     cDiv.addEventListener('click', () => openFile(cPath));
@@ -369,7 +628,7 @@
                     const item = document.createElement('div');
                     item.className = `tree-item ${filepath === activeFile ? 'active' : ''}`;
                     item.innerHTML = `
-                        <span>📄 ${filepath}</span>
+                        <span><span class="file-icon">${getFileIcon(filepath)}</span>${filepath}</span>
                         <span class="del-btn" data-del-file="${filepath}">✖</span>
                     `;
                     item.addEventListener('click', () => openFile(filepath));
@@ -388,58 +647,104 @@
             });
         }
 
+        // ===== TABS =====
         function renderTabs() {
             tabsHeader.innerHTML = '';
             Object.keys(fileStructure.files).forEach(filepath => {
                 const tab = document.createElement('div');
                 tab.className = `tab ${filepath === activeFile ? 'active' : ''}`;
-                tab.innerText = filepath.split('/').pop();
+                tab.innerHTML = `<span>${filepath.split('/').pop()}</span><span class="close-tab" data-close="${filepath}">✕</span>`;
+                tab.querySelector('.close-tab').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteItem(filepath, false);
+                });
                 tab.addEventListener('click', () => openFile(filepath));
                 tabsHeader.appendChild(tab);
             });
         }
 
+        // ===== MEDIA PREVIEW =====
+        function updateMediaPreview() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            const mediaType = MEDIA_TYPES[ext];
+            
+            if (!mediaType) return;
+            
+            previewContainer.innerHTML = '';
+            const player = document.createElement('div');
+            player.className = 'media-player';
+
+            if (mediaType === 'audio') {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = `data:audio/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                player.appendChild(audio);
+            } else if (mediaType === 'video') {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.src = `data:video/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                player.appendChild(video);
+            } else if (mediaType === 'image') {
+                const div = document.createElement('div');
+                div.className = 'media-viewer';
+                const img = document.createElement('img');
+                img.src = `data:image/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                div.appendChild(img);
+                player.appendChild(div);
+            }
+
+            previewContainer.appendChild(player);
+        }
+
+        // ===== PREVIEW & FULLSCREEN =====
         function runPreview() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            const mediaType = MEDIA_TYPES[ext];
+            
+            if (mediaType) {
+                updateMediaPreview();
+                document.getElementById('previewTitle').textContent = `${getFileIcon(activeFile)} ${activeFile}`;
+                return;
+            }
+
             let html = fileStructure.files['index.html'] || '';
             
             Object.keys(fileStructure.files).forEach(path => {
                 if (path.endsWith('.css')) {
                     html += `<style>${fileStructure.files[path]}</style>`;
                 }
-                if (path.endsWith('.js') && !path.includes('script.js')) {
+                if (path.endsWith('.js') && !path.includes('node_modules')) {
                     html += `<script>${fileStructure.files[path]}<\/script>`;
                 }
             });
 
-            if(fileStructure.files['src/script.js']) {
-                html += `<script>${fileStructure.files['src/script.js']}<\/script>`;
+            try {
+                const frameDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                frameDoc.open();
+                frameDoc.write(html);
+                frameDoc.close();
+
+                const fsFrame = document.getElementById('fs-preview-frame');
+                const fsFrameDoc = fsFrame.contentDocument || fsFrame.contentWindow.document;
+                fsFrameDoc.open();
+                fsFrameDoc.write(html);
+                fsFrameDoc.close();
+
+                document.getElementById('previewTitle').textContent = '🌐 Canlı Önizleme';
+            } catch(e) {
+                console.error('Preview error:', e);
             }
-
-            const frame = document.getElementById('preview-frame');
-            const frameDoc = frame.contentDocument || frame.contentWindow.document;
-            frameDoc.open();
-            frameDoc.write(html);
-            frameDoc.close();
-
-            const fsFrame = document.getElementById('fs-preview-frame');
-            const fsFrameDoc = fsFrame.contentDocument || fsFrame.contentWindow.document;
-            fsFrameDoc.open();
-            fsFrameDoc.write(html);
-            fsFrameDoc.close();
         }
 
         function toggleFullscreen(show) {
             const modal = document.getElementById('fullscreen-modal');
-            if (show) {
-                modal.classList.add('active');
-                runPreview();
-            } else {
-                modal.classList.remove('active');
-            }
+            modal.classList.toggle('active', show);
+            if (show) runPreview();
         }
 
+        // ===== AI REFERENCE =====
         function updateRefSelect() {
-            refSelect.innerHTML = '<option value="">📎 AI\'ya Odak Dosya Bağla...</option>';
+            refSelect.innerHTML = '<option value="">📎 Dosya Bağla...</option>';
             Object.keys(fileStructure.files).forEach(filepath => {
                 refSelect.innerHTML += `<option value="${filepath}">${filepath}</option>`;
             });
@@ -448,7 +753,7 @@
         function setReferenceFile(filepath) {
             if (!filepath) { clearReference(); return; }
             referenceFile = filepath;
-            document.getElementById('refFileName').innerText = `📄 Referans: ${filepath}`;
+            document.getElementById('refFileName').innerText = `📄 ${filepath}`;
             document.getElementById('refFileBox').style.display = 'flex';
         }
 
@@ -458,6 +763,7 @@
             document.getElementById('refFileBox').style.display = 'none';
         }
 
+        // ===== CHAT =====
         function addMessage(text, sender) {
             const chatHistory = document.getElementById('chatHistory');
             const msgDiv = document.createElement('div');
@@ -467,42 +773,42 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // --- AUTONOMOUS AI ENGINE ---
+        // ===== AI ENGINE =====
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const prompt = input.value.trim();
             const apiKey = localStorage.getItem('gemini_api_key') || apiKeyInput.value.trim();
 
             if (!prompt) return;
-            if (!apiKey) { alert('Lütfen sol üst alana Gemini API Key girip kaydedin!'); return; }
+            if (!apiKey) return alert('Lütfen Gemini API Key girin!');
 
             addMessage(prompt, 'user');
             input.value = '';
 
-            addMessage('⚡️ Nambır AI Kod Düzenliyor...', 'ai');
+            addMessage('⚡️ Nambır AI Çalışıyor...', 'ai');
             const loadingMsg = document.getElementById('chatHistory').lastChild;
 
             try {
-                const systemPrompt = `
-Sen "Nambır AI Auto-Pilot" otonom geliştirme asistanısın. KESİNLİKLE sohbet alanına kod yazmayacaksın.
-Doğrudan projenin yapısını, dosyalarını ve kodlarını kontrol ediyorsun.
+                const refFileContent = referenceFile ? `\nREFERENS DOSYA (${referenceFile}):\n${fileStructure.files[referenceFile]}` : '';
+                
+                const systemPrompt = `Sen "Nambır AI" - projenin sahibi gibi davran. Kodları düzenle, optimize et, yeni özellikler ekle.
 
-MEVCUT PROJE YAPISI:
+MEVCUT PROJE:
 ${JSON.stringify(fileStructure, null, 2)}
 
-AKTİF DOSYA: ${activeFile}
+AKTİF DOSYA: ${activeFile}${refFileContent}
+
 KULLANICI İSTEĞİ: "${prompt}"
 
-SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER:
+JSON FORMATINDA YANIT VER:
 {
-  "summary": "Kısa Türkçe açıklama",
-  "createFolders": ["yeni_klasor_adi"],
-  "deleteItems": ["silinecek_yol"],
+  "summary": "Kısa açıklama",
+  "createFolders": ["folder"],
+  "deleteItems": ["path"],
   "updateFiles": {
-    "index.html": "tam kod..."
+    "file": "content"
   }
-}
-                `;
+}`;
 
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
                     method: 'POST',
@@ -513,24 +819,24 @@ SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER:
                 const data = await response.json();
 
                 if (data.error) {
-                    loadingMsg.innerText = `⚠️ Hata (${data.error.code}): ${data.error.message}`;
+                    loadingMsg.innerText = `⚠️ ${data.error.message}`;
                     return;
                 }
 
-                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
                     let rawReply = data.candidates[0].content.parts[0].text;
                     rawReply = rawReply.replace(/```json/g, '').replace(/```/g, '').trim();
                     
                     try {
                         const aiAction = JSON.parse(rawReply);
                         
-                        if (aiAction.createFolders && Array.isArray(aiAction.createFolders)) {
+                        if (aiAction.createFolders?.length) {
                             aiAction.createFolders.forEach(fol => {
                                 if (!fileStructure.folders[fol]) fileStructure.folders[fol] = [];
                             });
                         }
 
-                        if (aiAction.deleteItems && Array.isArray(aiAction.deleteItems)) {
+                        if (aiAction.deleteItems?.length) {
                             aiAction.deleteItems.forEach(item => {
                                 deleteItem(item, !!fileStructure.folders[item]);
                             });
@@ -550,23 +856,23 @@ SADECE AŞAĞIDAKİ JSON FORMATINDA YANIT VER:
                         }
 
                         saveAndRefresh();
-                        if (aiAction.updateFiles && aiAction.updateFiles[activeFile] !== undefined) {
+                        if (aiAction.updateFiles?.[activeFile]) {
                             codeEditor.value = fileStructure.files[activeFile];
                             updateLineNumbers();
+                            highlightCode();
                         }
 
-                        loadingMsg.innerHTML = `✅ <b>İşlem Tamamlandı:</b> ${aiAction.summary || 'Proje güncellendi.'}`;
+                        loadingMsg.innerHTML = `✅ <b>${aiAction.summary || 'Tamamlandı'}</b>`;
 
                     } catch(jsonErr) {
-                        loadingMsg.innerText = `⚠️ Yapay Zeka Format Hatası. Lütfen tekrar deneyin.`;
+                        loadingMsg.innerText = `⚠️ Format hatası. Tekrar dene.`;
                     }
-
                 } else {
                     loadingMsg.innerText = "Yanıt alınamadı.";
                 }
 
             } catch (err) {
-                loadingMsg.innerText = `⚠️ Bağlantı Hatası: ${err.message}`;
+                loadingMsg.innerText = `⚠️ ${err.message}`;
             }
         }
     </script>
