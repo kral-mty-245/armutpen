@@ -122,7 +122,7 @@
 
     <header>
         <div class="logo">
-            🍐 Armut Pen <span>v7.1</span>
+            🍐 Armut Pen <span>v7.1-fix</span>
         </div>
         <div class="actions">
             <input type="password" id="apiKeyInput" placeholder="Gemini API Key">
@@ -177,7 +177,7 @@
             <div class="panel-header">🤖 Nambır AI (Sahip)</div>
             <div class="chat-history" id="chatHistory">
                 <div class="message ai">
-                    Selam! <b>v7.1</b> - ZIP Viewer ekli! 🚀
+                    Selam! <b>v7.1-fix</b> - ZIP Viewer düzeltildi! 🚀
                 </div>
             </div>
             <div class="chat-input-area">
@@ -247,7 +247,7 @@
         let referenceFile = null;
         let isDarkTheme = true;
         let consoleLogs = [];
-        let zipViewerData = null;
+        let binaryFiles = {}; // ZIP gibi binary dosyaları ayrı tutar
 
         const codeEditor = document.getElementById('codeEditor');
         const codeHighlight = document.getElementById('highlightCode');
@@ -390,20 +390,36 @@
                 const ext = file.name.split('.').pop().toLowerCase();
                 
                 if (ext === 'zip') {
-                    const jsZip = new JSZip();
-                    const zip = await jsZip.loadAsync(file);
-                    for (const [path, zipFile] of Object.entries(zip.files)) {
-                        if (!zipFile.dir) {
-                            const content = await zipFile.async('string');
-                            fileStructure.files[path] = content;
-                            const folder = path.split('/').slice(0, -1).join('/');
-                            if (folder && !fileStructure.folders[folder]) fileStructure.folders[folder] = [];
-                            if (folder) fileStructure.folders[folder].push(path);
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const jsZip = new JSZip();
+                        const zip = await jsZip.loadAsync(arrayBuffer);
+                        
+                        // Binary ZIP verisini saklıyoruz
+                        binaryFiles[file.name] = arrayBuffer;
+                        fileStructure.files[file.name] = `[ZIP: ${file.size} bytes]`;
+                        
+                        for (const [path, zipFile] of Object.entries(zip.files)) {
+                            if (!zipFile.dir) {
+                                try {
+                                    const content = await zipFile.async('string');
+                                    fileStructure.files[path] = content;
+                                    const folder = path.split('/').slice(0, -1).join('/');
+                                    if (folder && !fileStructure.folders[folder]) fileStructure.folders[folder] = [];
+                                    if (folder) fileStructure.folders[folder].push(path);
+                                } catch {
+                                    // Binary dosya - text olarak sakla
+                                    fileStructure.files[path] = `[Binary: ${path}]`;
+                                }
+                            }
                         }
+                    } catch (err) {
+                        alert(`ZIP yükleme hatası: ${err.message}`);
                     }
                 } else if (BINARY_TYPES.includes(ext)) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
+                        binaryFiles[file.name] = event.target.result;
                         fileStructure.files[file.name] = `[Binary: ${ext.toUpperCase()}] - ${file.size} bytes`;
                     };
                     reader.readAsArrayBuffer(file);
@@ -415,7 +431,7 @@
                     reader.readAsText(file);
                 }
             }
-            saveAndRefresh();
+            setTimeout(() => saveAndRefresh(), 500);
             document.getElementById('fileImport').value = '';
         }
 
@@ -506,6 +522,7 @@
                 delete fileStructure.folders[path];
             } else {
                 delete fileStructure.files[path];
+                delete binaryFiles[path];
                 Object.keys(fileStructure.folders).forEach(fol => {
                     fileStructure.folders[fol] = fileStructure.folders[fol].filter(x => x !== path);
                 });
@@ -606,19 +623,25 @@
             previewContainer.innerHTML = '';
             
             if (ext === 'zip') {
-                // ZIP VIEWER
+                // ZIP VIEWER - Binary dosyadan oku
                 try {
+                    let arrayBuffer = binaryFiles[activeFile];
+                    
+                    // Binary dosya bellekte yoksa, hata ver
+                    if (!arrayBuffer) {
+                        previewContainer.innerHTML = `<div style="color: #ff5555; padding: 20px; text-align: center;"><b>⚠️ ZIP dosyası bellekte yok</b><br><br>ZIP dosyasını "İçe Aktar" butonu ile yeniden yükle!</div>`;
+                        return;
+                    }
+
                     const jsZip = new JSZip();
-                    const binaryData = fileStructure.files[activeFile];
-                    const zip = await jsZip.loadAsync(binaryData);
-                    zipViewerData = {};
+                    const zip = await jsZip.loadAsync(arrayBuffer);
                     
                     const viewer = document.createElement('div');
                     viewer.className = 'zip-viewer';
                     
                     const header = document.createElement('div');
                     header.className = 'zip-header';
-                    header.innerHTML = `<span>📦 ${activeFile} - ${Object.keys(zip.files).length} dosya</span><button class="secondary" style="font-size:10px;" onclick="alert('ZIP dosyası - İçe aktar butonu ile projeye ekleyebilirsin!')">ℹ️ Bilgi</button>`;
+                    header.innerHTML = `<span>📦 ${activeFile} - ${Object.keys(zip.files).length} dosya</span><button class="secondary" style="font-size:10px;">✓ Başarılı</button>`;
                     viewer.appendChild(header);
                     
                     const content = document.createElement('div');
@@ -627,8 +650,12 @@
                     const items = [];
                     for (const [path, file] of Object.entries(zip.files)) {
                         if (path !== '' && !path.endsWith('/')) {
-                            const data = await file.async('string');
-                            items.push({ path, size: file._data.uncompressedSize, data });
+                            try {
+                                const data = await file.async('text');
+                                items.push({ path, size: file._data.uncompressedSize, data, isText: true });
+                            } catch {
+                                items.push({ path, size: file._data.uncompressedSize, data: '[Binary]', isText: false });
+                            }
                         }
                     }
                     
@@ -636,11 +663,12 @@
                         const div = document.createElement('div');
                         div.className = 'zip-item';
                         div.innerHTML = `
-                            <div class="zip-item-name">📄 ${item.path}</div>
+                            <div class="zip-item-name">${item.isText ? '📄' : '🔒'} ${item.path}</div>
                             <div class="zip-item-size">${(item.size / 1024).toFixed(2)} KB</div>
                         `;
                         div.addEventListener('click', () => {
-                            alert(`📄 ${item.path}\n\n${item.data.substring(0, 200)}...`);
+                            const preview = item.data.substring(0, 300);
+                            alert(`📄 ${item.path}\nBoyut: ${(item.size / 1024).toFixed(2)} KB\n\n${preview}${item.data.length > 300 ? '...' : ''}`);
                         });
                         content.appendChild(div);
                     });
@@ -648,7 +676,7 @@
                     viewer.appendChild(content);
                     previewContainer.appendChild(viewer);
                 } catch (err) {
-                    previewContainer.innerHTML = `<div style="color: red; padding: 20px;">Hata: ZIP dosyası okunamadı</div>`;
+                    previewContainer.innerHTML = `<div style="color: #ff5555; padding: 20px;"><b>❌ ZIP Hata:</b><br>${err.message}</div>`;
                 }
                 document.getElementById('previewTitle').textContent = `📦 ${activeFile}`;
                 return;
