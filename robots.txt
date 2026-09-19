@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kral-mty-245.github.io/armutpen/sitemap.xml

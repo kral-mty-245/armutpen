@@ -1,0 +1,10 @@
+{
+  "name": "Armut Pen",
+  "short_name": "Armut Pen",
+  "description": "NOMI AI destekli çevrim içi kod editörü.",
+  "start_url": "/armutpen/",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#0e639c",
+  "lang": "tr"
+}
