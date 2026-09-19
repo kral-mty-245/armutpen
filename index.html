@@ -19,45 +19,858 @@
         .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
         input, select, textarea { background-color: #3c3c3c; border: 1px solid #555; color: white; padding: 5px 8px; border-radius: 4px; font-size: 11px; }
         button { background-color: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-weight: 600; font-size: 11px; transition: all .2s; }
-        button:hover { filter: brightness(1.18); } button.secondary { background-color: #3c3c3c; } button.success { background-color: var(--success); }
-        .workspace { display: flex; flex: 1; min-height: 0; } #sidebar { width: 220px; background: var(--bg-light); border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; }
+        button:hover { filter: brightness(1.18); }
+        button.secondary { background-color: #3c3c3c; }
+        button.success { background-color: var(--success); }
+        .workspace { display: flex; flex: 1; min-height: 0; }
+        #sidebar { width: 220px; background: var(--bg-light); border-right: 1px solid #3c3c3c; display: flex; flex-direction: column; }
         .sidebar-header, .panel-header { padding: 8px 12px; font-size: 11px; font-weight: bold; color: #aaa; background: #2d2d2d; border-bottom: 1px solid #3c3c3c; }
-        .sidebar-header { display: flex; justify-content: space-between; } .tree-actions { display: flex; gap: 3px; }.search-box { padding: 6px; border-bottom: 1px solid #3c3c3c; }.search-box input { width: 100%; }
-        .file-tree { flex: 1; overflow-y: auto; padding: 5px 0; }.tree-item { padding: 5px 12px; font-size: 12px; cursor: pointer; display:flex; justify-content:space-between; }.tree-item:hover { background:#2a2d2e; }.tree-item.active { background:#37373d; border-left:3px solid var(--primary); }.tree-item.folder { font-weight:bold;color:#e8a838; }.del-btn,.add-file-btn { display:none; }.tree-item:hover .del-btn,.tree-item.folder:hover .add-file-btn { display:inline; }.folder-children { padding-left:12px; }
-        #editor-panel,#preview-panel,#ai-panel { display:flex; flex-direction:column; min-width:0; } #editor-panel { flex:1.3; border-right:1px solid #3c3c3c; }.tabs { display:flex; overflow-x:auto; background:#2d2d2d; }.tab { padding:7px 12px;font-size:11px;color:#969696;cursor:pointer;white-space:nowrap; }.tab.active { background:var(--bg-dark);color:#fff;border-top:2px solid var(--primary); }.editor-wrapper { flex:1;display:flex;overflow:hidden; }.line-numbers { width:45px;padding:10px 6px;text-align:right;color:#858585;font:12px/1.5 monospace;overflow:hidden; }.code-editor-wrapper { flex:1;position:relative;overflow:hidden; } textarea#codeEditor,#codeHighlight { position:absolute;inset:0;width:100%;height:100%;padding:10px;border:0;outline:0;font:12px/1.5 'Courier New',monospace;white-space:pre;overflow:auto; }.code-editor-wrapper textarea { z-index:2;background:transparent;color:transparent;caret-color:white;resize:none; }.code-editor-wrapper pre { z-index:1;background:var(--bg-dark);margin:0; }.console-panel { height:120px;overflow:auto;padding:8px;background:#1a1a1a;font:11px monospace;border-top:1px solid #3c3c3c; }.console-error { color:#ff5555; }.console-log { color:#d4d4d4; }.console-info { color:#4ec9b0; }
-        #preview-panel { flex:1;border-right:1px solid #3c3c3c;background:white; } #preview-container { flex:1;overflow:auto; } #preview-frame { width:100%;height:100%;border:0; }.media-player,.media-viewer,.zip-viewer { width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--bg-dark); }.media-player { flex-direction:column; }.media-player audio,.media-player video { width:90%; }.media-viewer img { max-width:100%;max-height:100%; }.zip-viewer { flex-direction:column;color:var(--text); }.zip-header,.zip-content { width:100%;padding:12px; }.zip-content { flex:1;overflow:auto; }.zip-item { padding:10px;margin:6px 0;background:#252526;border-left:3px solid var(--primary);cursor:pointer;display:flex;justify-content:space-between; }
-        #ai-panel { width:300px;background:var(--bg-light); }.chat-history { flex:1;padding:12px;overflow:auto;display:flex;flex-direction:column;gap:8px; }.message { padding:8px 10px;border-radius:6px;font-size:11px;max-width:92%;line-height:1.4;word-wrap:break-word; }.message.user { background:var(--primary);align-self:flex-end;color:white; }.message.ai { background:#333;border:1px solid #444; }.chat-input-area { padding:8px;background:var(--bg-dark);border-top:1px solid #3c3c3c;display:flex;flex-direction:column;gap:6px; }.ref-file-box { font-size:10px;color:#a6e22e;display:flex;justify-content:space-between;background:var(--bg-light);padding:4px 8px; }.modal { display:none;position:fixed;inset:0;background:#000b;z-index:10000;align-items:center;justify-content:center; }.modal.active { display:flex; }.modal-content { background:var(--bg-light);padding:20px;border-radius:8px;max-width:550px;width:92%;max-height:85vh;overflow:auto; }.modal-body>* { width:100%;margin:5px 0; }.modal-footer { display:flex;gap:8px;justify-content:flex-end;margin-top:12px; }.provider-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:8px; }.provider-card { padding:10px;background:#333;border:1px solid #555;border-radius:5px; }.provider-card label { display:block;font-weight:bold;margin-bottom:5px; }.provider-card input,.provider-card select { width:100%;margin-top:4px; }.settings-note { color:#aaa;font-size:10px;margin:10px 0;line-height:1.4; }
-        #fullscreen-modal { display:none;position:fixed;inset:0;background:#000;z-index:99999;flex-direction:column; } #fullscreen-modal.active { display:flex; } #fullscreen-modal .fs-header { background:var(--bg-light);padding:10px 15px;display:flex;justify-content:space-between;align-items:center; } body.light-theme { --bg-dark:#f5f5f5;--bg-light:#fff;--text:#333; } body.light-theme textarea#codeEditor { caret-color:#111; }
+        .sidebar-header { display: flex; justify-content: space-between; }
+        .tree-actions { display: flex; gap: 3px; }
+        .search-box { padding: 6px; border-bottom: 1px solid #3c3c3c; }
+        .search-box input { width: 100%; }
+        .file-tree { flex: 1; overflow-y: auto; padding: 5px 0; }
+        .tree-item { padding: 5px 12px; font-size: 12px; cursor: pointer; display:flex; justify-content:space-between; }
+        .tree-item:hover { background:#2a2d2e; }
+        .tree-item.active { background:#37373d; border-left:3px solid var(--primary); }
+        .tree-item.folder { font-weight:bold;color:#e8a838; }
+        .del-btn, .add-file-btn { display:none; }
+        .tree-item:hover .del-btn, .tree-item.folder:hover .add-file-btn { display:inline; }
+        .folder-children { padding-left:12px; }
+        #editor-panel, #preview-panel, #ai-panel { display:flex; flex-direction:column; min-width:0; }
+        #editor-panel { flex:1.3; border-right:1px solid #3c3c3c; }
+        .tabs { display:flex; overflow-x:auto; background:#2d2d2d; }
+        .tab { padding:7px 12px; font-size:11px; color:#969696; cursor:pointer; white-space:nowrap; }
+        .tab.active { background:var(--bg-dark); color:#fff; border-top:2px solid var(--primary); }
+        .editor-wrapper { flex:1; display:flex; overflow:hidden; }
+        .line-numbers { width:45px; padding:10px 6px; text-align:right; color:#858585; font:12px/1.5 monospace; overflow:hidden; }
+        .code-editor-wrapper { flex:1; position:relative; overflow:hidden; }
+        textarea#codeEditor, #codeHighlight { position:absolute; inset:0; width:100%; height:100%; padding:10px; border:0; outline:0; font:12px/1.5 'Courier New', monospace; white-space:pre; overflow:auto; }
+        .code-editor-wrapper textarea { z-index:2; background:transparent; color:transparent; caret-color:white; resize:none; }
+        .code-editor-wrapper pre { z-index:1; background:var(--bg-dark); margin:0; }
+        .console-panel { height:120px; overflow:auto; padding:8px; background:#1a1a1a; font:11px monospace; border-top:1px solid #3c3c3c; }
+        .console-error { color:#ff5555; }
+        .console-log { color:#d4d4d4; }
+        .console-info { color:#4ec9b0; }
+        #preview-panel { flex:1; border-right:1px solid #3c3c3c; background:white; }
+        #preview-container { flex:1; overflow:auto; }
+        #preview-frame { width:100%; height:100%; border:0; }
+        .media-player, .media-viewer, .zip-viewer { width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--bg-dark); }
+        .media-player { flex-direction:column; }
+        .media-player audio, .media-player video { width:90%; }
+        .media-viewer img { max-width:100%; max-height:100%; }
+        .zip-viewer { flex-direction:column; color:var(--text); }
+        .zip-header, .zip-content { width:100%; padding:12px; }
+        .zip-content { flex:1; overflow:auto; }
+        .zip-item { padding:10px; margin:6px 0; background:#252526; border-left:3px solid var(--primary); cursor:pointer; display:flex; justify-content:space-between; }
+        #ai-panel { width:300px; background:var(--bg-light); }
+        .chat-history { flex:1; padding:12px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
+        .message { padding:8px 10px; border-radius:6px; font-size:11px; max-width:92%; line-height:1.4; word-wrap:break-word; }
+        .message.user { background:var(--primary); align-self:flex-end; color:white; }
+        .message.ai { background:#333; border:1px solid #444; }
+        .chat-input-area { padding:8px; background:var(--bg-dark); border-top:1px solid #3c3c3c; display:flex; flex-direction:column; gap:6px; }
+        .quick-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .quick-actions button { font-size:10px; padding:4px 7px; }
+        .ref-file-box { font-size:10px; color:#a6e22e; display:flex; justify-content:space-between; background:var(--bg-light); padding:4px 8px; }
+        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:10000; align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:var(--bg-light); padding:20px; border-radius:8px; max-width:620px; width:92%; max-height:85vh; overflow:auto; }
+        .modal-body > * { width:100%; margin:5px 0; }
+        .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+        .provider-grid { display:grid; grid-template-columns:repeat(2, minmax(220px, 1fr)); gap:10px; }
+        .provider-card { padding:10px; background:#333; border:1px solid #555; border-radius:5px; }
+        .provider-card label { display:block; font-weight:bold; margin-bottom:6px; }
+        .provider-card input, .provider-card select { width:100%; margin-top:4px; }
+        .settings-note { color:#aaa; font-size:10px; margin:10px 0; line-height:1.5; }
+        .github-grid { display:grid; gap:8px; grid-template-columns:repeat(2, minmax(220px, 1fr)); margin-top:10px; }
+        #fullscreen-modal { display:none; position:fixed; inset:0; background:#000; z-index:99999; flex-direction:column; }
+        #fullscreen-modal.active { display:flex; }
+        #fullscreen-modal .fs-header { background:var(--bg-light); padding:10px 15px; display:flex; justify-content:space-between; align-items:center; }
+        body.light-theme { --bg-dark:#f5f5f5; --bg-light:#fff; --text:#333; }
+        body.light-theme textarea#codeEditor { caret-color:#111; }
     </style>
 </head>
 <body>
-<header><div class="logo">🍐 Armut Pen <span>NOMI AI</span></div><div class="actions"><button class="secondary" id="btnAiSettings">⚙️ AI Ayarları</button><input type="file" id="fileImport" accept=".zip,.rar,.html,.css,.js,.py,.java,.c,.cpp,.go,.rs,.json,.mp3,.mp4,.wav,.m4a,.png,.jpg,.jpeg,.txt" multiple hidden><button class="secondary" id="btnImport">📂 İçe Aktar</button><button class="success" id="btnDownloadZip">📦 ZIP İndir</button><button class="secondary" id="btnFindReplace">🔍 Ara</button><button class="secondary" id="btnTheme">🌙 Tema</button><button id="btnRefresh">🔄</button></div></header>
-<div class="workspace"><div id="sidebar"><div class="sidebar-header"><span>📁 DOSYALAR</span><div class="tree-actions"><button id="btnAddFolder">📁+</button><button id="btnAddFile">📄+</button></div></div><div class="search-box"><input id="searchFiles" placeholder="Dosyalarda ara..."></div><div class="file-tree" id="fileTree"></div></div><div id="editor-panel"><div class="tabs" id="tabsHeader"></div><div class="editor-wrapper"><div class="line-numbers" id="lineNumbers">1</div><div class="code-editor-wrapper"><textarea id="codeEditor" spellcheck="false"></textarea><pre id="codeHighlight"><code id="highlightCode"></code></pre></div></div><div class="console-panel" id="consolePanel"></div></div><div id="preview-panel"><div class="panel-header"><span id="previewTitle">🌐 Canlı Önizleme</span><button class="secondary" id="btnFullscreen">⛶ Tam Ekran</button></div><div id="preview-container"><iframe id="preview-frame"></iframe></div></div><div id="ai-panel"><div class="panel-header">🤖 NOMI AI <button class="secondary" id="btnAiFullscreen" style="float:right">⛶</button></div><div class="chat-history" id="chatHistory"><div class="message ai">Selam! Ben <b>NOMI AI</b>. Projeni birlikte yönetelim. 🚀</div></div><div class="chat-input-area"><div id="refFileBox" class="ref-file-box" style="display:none"><span id="refFileName"></span><span id="btnClearRef">✖</span></div><select id="refSelect"><option value="">📎 Dosya Bağla...</option></select><div style="display:flex;gap:4px"><input id="userInput" placeholder="NOMI AI'ya talimat..." style="flex:1"><button id="btnSendAi">Gönder</button></div></div></div></div>
-<div id="fullscreen-modal"><div class="fs-header"><span>🌐 Tam Ekran Önizleme</span><button class="secondary" id="btnCloseFs">❌ Kapat</button></div><iframe id="fs-preview-frame" style="flex:1;width:100%;border:0"></iframe></div>
-<div id="aiSettingsModal" class="modal"><div class="modal-content"><div class="modal-header">⚙️ NOMI AI Ayarları</div><p class="settings-note">Bir sağlayıcı seç, API anahtarını gir, çalışan bir modeli seç ve kaydet. Anahtarlar yalnızca bu tarayıcıda saklanır; üretimde sunucu tarafı proxy kullanılması önerilir.</p><div class="provider-grid" id="providerGrid"></div><div class="modal-footer"><button class="secondary" id="btnCloseAiSettings">Kapat</button><button class="success" id="btnSaveAiSettings">💾 Ayarları Kaydet</button></div></div></div>
-<div id="findReplaceModal" class="modal"><div class="modal-content"><h3>🔍 Ara ve Değiştir</h3><div class="modal-body"><input id="searchInput" placeholder="Aranan metin"><input id="replaceInput" placeholder="Yeni metin"></div><div class="modal-footer"><button id="btnFindAll">Tümünü Bul</button><button id="btnReplaceAll">Tümünü Değiştir</button><button class="secondary" id="btnCloseFindReplace">Kapat</button></div></div></div>
-<script>
-const PROVIDERS={gemini:{label:'Google Gemini API',models:[['gemini-3.6-flash','Gemini 3.6 Flash'],['gemini-3.5-flash','Gemini 3.5 Flash'],['gemini-3.1-pro-preview','Gemini 3.1 Pro']]},openai:{label:'OpenAI ChatGPT',models:[['gpt-6-astra','GPT-6 Astra'],['gpt-5.6-sol','GPT-5.6 Sol'],['gpt-5.4-mini','GPT-5.4 mini']]},anthropic:{label:'Anthropic Claude',models:[['claude-opus-5','Claude Opus 5'],['claude-sonnet-5','Claude Sonnet 5'],['claude-haiku-4-5','Claude Haiku 4.5']]},xai:{label:'xAI Grok',models:[['grok-4.7','Grok 4.7'],['grok-4.6','Grok 4.6'],['grok-4.5','Grok 4.5']]},deepseek:{label:'DeepSeek',models:[['deepseek-v4-flash','DeepSeek V4 Flash'],['deepseek-v4-pro','DeepSeek V4 Pro']]}};
-const LANGUAGE_MAP={html:'html',css:'css',js:'javascript',json:'json',py:'python',java:'java',c:'c',cpp:'cpp',go:'go',rs:'rust',txt:'plaintext'},MEDIA_TYPES={mp3:'audio',wav:'audio',m4a:'audio',mp4:'video',webm:'video',png:'image',jpg:'image',jpeg:'image'},BINARY_TYPES=['zip','rar','exe','apk','7z','tar','gz'];
-let fileStructure={folders:{src:['src/style.css','src/script.js']},files:{'index.html':"<!DOCTYPE html>\n<html><head><meta charset='UTF-8'></head><body><h1>🍐 Armut Pen v7.1</h1><p>NOMI AI ile üret.</p></body></html>",'src/style.css':'body { background:#1e1e1e;color:#a6e22e;font-family:Arial;text-align:center;padding:50px; }','src/script.js':"console.log('Çalışıyor!');"}},activeFile='index.html',referenceFile=null,binaryFiles={},consoleLogs=[];
-const $=id=>document.getElementById(id),codeEditor=$('codeEditor'),codeHighlight=$('highlightCode'),fileTree=$('fileTree'),tabsHeader=$('tabsHeader'),refSelect=$('refSelect'),consolePanel=$('consolePanel');
-window.addEventListener('DOMContentLoaded',()=>{try{const s=localStorage.getItem('armut_v7_struct');if(s)fileStructure=JSON.parse(s)}catch(e){}; bind();openFile(activeFile);updateFileTree();updateRefSelect();setupConsoleInterception();});
-function bind(){ $('btnAiSettings').onclick=()=>toggleModal('aiSettingsModal',true);$('btnCloseAiSettings').onclick=()=>toggleModal('aiSettingsModal',false);$('btnSaveAiSettings').onclick=saveAiSettings;$('btnDownloadZip').onclick=downloadZip;$('btnRefresh').onclick=runPreview;$('btnAddFolder').onclick=createNewFolder;$('btnAddFile').onclick=createNewFileRoot;$('btnFullscreen').onclick=()=>toggleFullscreen(true);$('btnCloseFs').onclick=()=>toggleFullscreen(false);$('btnAiFullscreen').onclick=()=>document.body.classList.toggle('ai-fullscreen');$('btnSendAi').onclick=sendMessage;$('btnClearRef').onclick=clearReference;$('btnImport').onclick=()=>$('fileImport').click();$('fileImport').onchange=handleImport;$('btnTheme').onclick=()=>document.body.classList.toggle('light-theme');$('btnFindReplace').onclick=()=>toggleModal('findReplaceModal',true);$('btnCloseFindReplace').onclick=()=>toggleModal('findReplaceModal',false);$('btnFindAll').onclick=findAll;$('btnReplaceAll').onclick=replaceAll;$('searchFiles').oninput=filterFileTree;$('userInput').onkeydown=e=>{if(e.key==='Enter')sendMessage()};refSelect.onchange=e=>setReferenceFile(e.target.value);codeEditor.oninput=()=>{fileStructure.files[activeFile]=codeEditor.value;persist();updateLineNumbers();highlightCode();runPreview()};codeEditor.onscroll=()=>{$('lineNumbers').scrollTop=codeEditor.scrollTop;$('codeHighlight').scrollTop=codeEditor.scrollTop};renderProviderSettings()}
-function toggleModal(id,show){$(id).classList.toggle('active',show)}
-function renderProviderSettings(){const saved=JSON.parse(localStorage.getItem('nomi_ai_settings')||'{}');$('providerGrid').innerHTML=Object.entries(PROVIDERS).map(([key,p])=>`<div class="provider-card"><label><input type="radio" name="provider" value="${key}" ${saved.provider===key?'checked':''}> ${p.label}</label><input type="password" id="key-${key}" placeholder="API key" value="${saved.keys?.[key]||''}"><select id="model-${key}">${p.models.map(m=>`<option value="${m[0]}" ${saved.models?.[key]===m[0]?'selected':''}>${m[1]}</option>`).join('')}</select></div>`).join('')}
-function saveAiSettings(){const provider=document.querySelector('input[name=provider]:checked')?.value;if(!provider)return alert('Bir AI sağlayıcısı seçin.');const keys={},models={};Object.keys(PROVIDERS).forEach(k=>{keys[k]=$('key-'+k).value.trim();models[k]=$('model-'+k).value});if(!keys[provider])return alert('Seçilen sağlayıcı için API key girin.');localStorage.setItem('nomi_ai_settings',JSON.stringify({provider,keys,models}));toggleModal('aiSettingsModal',false);addMessage(`✅ ${PROVIDERS[provider].label} / ${models[provider]} hazır.`,'ai')}
-function getSettings(){return JSON.parse(localStorage.getItem('nomi_ai_settings')||'{}')}
-function setupConsoleInterception(){const ol=console.log,oe=console.error;console.log=(...a)=>{consoleLogs.push({type:'log',content:a.join(' ')});updateConsolePanel();ol(...a)};console.error=(...a)=>{consoleLogs.push({type:'error',content:a.join(' ')});updateConsolePanel();oe(...a)}}function updateConsolePanel(){consolePanel.innerHTML=consoleLogs.map(x=>`<div class="console-log console-${x.type}">${escapeHtml(x.content)}</div>`).join('');consolePanel.scrollTop=consolePanel.scrollHeight}function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
-function persist(){localStorage.setItem('armut_v7_struct',JSON.stringify(fileStructure))}function updateLineNumbers(){$('lineNumbers').innerHTML=codeEditor.value.split('\n').map((_,i)=>i+1+'<br>').join('')}function highlightCode(){const l=LANGUAGE_MAP[activeFile.split('.').pop().toLowerCase()]||'plaintext';codeHighlight.textContent=codeEditor.value;codeHighlight.className='language-'+l;hljs.highlightElement(codeHighlight)}
-function openFile(p){if(fileStructure.files[p]===undefined)return;activeFile=p;codeEditor.value=fileStructure.files[p];updateLineNumbers();highlightCode();renderTabs();updateFileTree();runPreview()}function renderTabs(){tabsHeader.innerHTML=Object.keys(fileStructure.files).map(p=>`<div class="tab ${p===activeFile?'active':''}" data-tab="${p}">${p.split('/').pop()}</div>`).join('');tabsHeader.querySelectorAll('[data-tab]').forEach(x=>x.onclick=()=>openFile(x.dataset.tab))}
-function updateFileTree(){fileTree.innerHTML='';Object.keys(fileStructure.folders).forEach(f=>{const d=document.createElement('div');d.className='tree-item folder';d.innerHTML=`<span>📁 ${f}</span><span class="add-file-btn">➕</span>`;d.onclick=e=>{if(e.target.classList.contains('add-file-btn'))createNewFileInFolder(f);};fileTree.appendChild(d);(fileStructure.folders[f]||[]).forEach(p=>addTreeItem(p))});Object.keys(fileStructure.files).filter(p=>!Object.values(fileStructure.folders).some(a=>a.includes(p))).forEach(addTreeItem);function addTreeItem(p){const d=document.createElement('div');d.className='tree-item '+(p===activeFile?'active':'');d.innerHTML=`<span>📄 ${p}</span><span class="del-btn">✖</span>`;d.onclick=e=>e.target.classList.contains('del-btn')?deleteItem(p):openFile(p);fileTree.appendChild(d)}}
-function updateRefSelect(){refSelect.innerHTML='<option value="">📎 Dosya Bağla...</option>'+Object.keys(fileStructure.files).map(p=>`<option>${p}</option>`).join('')}function setReferenceFile(p){referenceFile=p||null;$('refFileBox').style.display=p?'flex':'none';$('refFileName').textContent='📄 '+p}function clearReference(){setReferenceFile('');refSelect.value=''}
-function createNewFolder(){const n=prompt('Yeni Klasör Adı:');if(n&&!fileStructure.folders[n]){fileStructure.folders[n]=[];saveAndRefresh()}}function createNewFileRoot(){const n=prompt('Dosya Adı (örn: script.js):');if(n)addFileToSystem(n)}function createNewFileInFolder(f){const n=prompt(`[${f}] klasörüne dosya adı:`);if(n){const p=f+'/'+n;fileStructure.folders[f].push(p);addFileToSystem(p)}}function addFileToSystem(p){if(fileStructure.files[p]===undefined){fileStructure.files[p]='';saveAndRefresh();openFile(p)}}function deleteItem(p){if(confirm('Dosyayı silmek istediğine emin misin?')){delete fileStructure.files[p];Object.keys(fileStructure.folders).forEach(f=>fileStructure.folders[f]=fileStructure.folders[f].filter(x=>x!==p));openFile(Object.keys(fileStructure.files)[0]);saveAndRefresh()}}function saveAndRefresh(){persist();updateFileTree();updateRefSelect();renderTabs();runPreview()}
-function filterFileTree(){const q=$('searchFiles').value.toLowerCase();document.querySelectorAll('.tree-item').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q)?'':'none')}function downloadZip(){const z=new JSZip();Object.entries(fileStructure.files).forEach(([p,c])=>z.file(p,c));z.generateAsync({type:'blob'}).then(b=>saveAs(b,'armut-pen-proje.zip'))}
-function runPreview(){const ext=activeFile.split('.').pop().toLowerCase();if(MEDIA_TYPES[ext])return;let html=fileStructure.files['index.html']||'';Object.entries(fileStructure.files).forEach(([p,c])=>{if(p.endsWith('.css'))html+='<style>'+c+'</style>';if(p.endsWith('.js'))html+='<script>'+c+'<\\/script>'});try{const d=$('preview-frame').contentDocument;d.open();d.write(html);d.close();const f=$('fs-preview-frame').contentDocument;f.open();f.write(html);f.close()}catch(e){console.error('Preview error:',e)}}function toggleFullscreen(s){$('fullscreen-modal').classList.toggle('active',s);if(s)runPreview()}
-async function handleImport(e){for(const file of e.target.files){const r=new FileReader();r.onload=x=>{fileStructure.files[file.name]=x.target.result;saveAndRefresh()};r.readAsText(file)}e.target.value=''}
-function addMessage(t,s){const d=document.createElement('div');d.className='message '+s;d.innerHTML=t;$('chatHistory').appendChild(d);$('chatHistory').scrollTop=$('chatHistory').scrollHeight}
-async function sendMessage(){const input=$('userInput'),prompt=input.value.trim(),s=getSettings();if(!prompt)return;if(!s.provider||!s.keys?.[s.provider])return alert('Önce NOMI AI Ayarları bölümünden sağlayıcı, API key ve model seçin.');addMessage(prompt,'user');input.value='';const loading=document.createElement('div');loading.className='message ai';loading.textContent='⚡️ NOMI AI çalışıyor...';$('chatHistory').appendChild(loading);const project=JSON.stringify(fileStructure).substring(0,12000),ref=referenceFile?'\nREFERANS DOSYASI:\n'+fileStructure.files[referenceFile].substring(0,2000):'';const system=`Sen NOMI AI'sın. Projeyi güvenli biçimde yönet. Kullanıcı GitHub push/repo oluşturma veya Pages yayınlama isterse doğrudan yapma; önce açıklayıcı bir onay butonu/eylem önerisi göster. Yalnızca JSON döndür: {"summary":"...","updateFiles":{},"action":null}. PROJE:${project} İSTEK:${prompt}${ref}`;try{const raw=await callProvider(s,system),clean=raw.replace(/```json|```/g,'').trim(),a=JSON.parse(clean);Object.entries(a.updateFiles||{}).forEach(([p,c])=>fileStructure.files[p]=c);saveAndRefresh();loading.innerHTML='✅ <b>'+escapeHtml(a.summary||'Tamamlandı')+'</b>'+(a.action?'<br>🔐 Onay gerekli: <button class="secondary" onclick="alert(\'Bu işlem için GitHub OAuth ve açık kullanıcı onayı gerekir.\')">Onayla</button>':'')}catch(e){loading.textContent='⚠️ '+e.message}}
-async function callProvider(s,prompt){const k=s.provider,key=s.keys[k],model=s.models[k];if(k==='gemini'){const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});const d=await r.json();if(d.error)throw Error(d.error.message);return d.candidates?.[0]?.content?.parts?.[0]?.text||''}if(k==='openai'){return openAICompat('https://api.openai.com/v1/chat/completions',key,model,prompt)}if(k==='xai'){return openAICompat('https://api.x.ai/v1/chat/completions',key,model,prompt)}if(k==='deepseek'){return openAICompat('https://api.deepseek.com/chat/completions',key,model,prompt)}if(k==='anthropic'){const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model,max_tokens:4096,messages:[{role:'user',content:prompt}]})});const d=await r.json();if(d.error)throw Error(d.error.message);return d.content?.[0]?.text||''}}async function openAICompat(url,key,model,prompt){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify({model,messages:[{role:'user',content:prompt}]})});const d=await r.json();if(d.error)throw Error(d.error.message);return d.choices?.[0]?.message?.content||''}
-function toggleFindReplace(s){toggleModal('findReplaceModal',s)}function findAll(){const q=$('searchInput').value;if(q)alert((codeEditor.value.split(q).length-1)+' eşleşme bulundu.')}function replaceAll(){const q=$('searchInput').value;if(!q)return;codeEditor.value=codeEditor.value.split(q).join($('replaceInput').value);codeEditor.dispatchEvent(new Event('input'));toggleFindReplace(false)}
-</script></body></html>
+    <header>
+        <div class="logo">🍐 Armut Pen <span>NOMI AI</span></div>
+        <div class="actions">
+            <button class="secondary" id="btnAiSettings">⚙️ AI Ayarları</button>
+            <input type="file" id="fileImport" accept=".zip,.rar,.html,.css,.js,.py,.java,.c,.cpp,.go,.rs,.json,.mp3,.mp4,.wav,.m4a,.png,.jpg,.jpeg,.txt" multiple hidden>
+            <button class="secondary" id="btnImport">📂 İçe Aktar</button>
+            <button class="success" id="btnDownloadZip">📦 ZIP İndir</button>
+            <button class="secondary" id="btnFindReplace">🔍 Ara</button>
+            <button class="secondary" id="btnTheme">🌙 Tema</button>
+            <button id="btnRefresh">🔄</button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <span>📁 DOSYALAR</span>
+                <div class="tree-actions">
+                    <button id="btnAddFolder">📁+</button>
+                    <button id="btnAddFile">📄+</button>
+                </div>
+            </div>
+            <div class="search-box">
+                <input id="searchFiles" placeholder="Dosyalarda ara...">
+            </div>
+            <div class="file-tree" id="fileTree"></div>
+        </div>
+
+        <div id="editor-panel">
+            <div class="tabs" id="tabsHeader"></div>
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <div class="code-editor-wrapper">
+                    <textarea id="codeEditor" spellcheck="false"></textarea>
+                    <pre id="codeHighlight"><code id="highlightCode"></code></pre>
+                </div>
+            </div>
+            <div class="console-panel" id="consolePanel"></div>
+        </div>
+
+        <div id="preview-panel">
+            <div class="panel-header">
+                <span id="previewTitle">🌐 Canlı Önizleme</span>
+                <button class="secondary" id="btnFullscreen">⛶ Tam Ekran</button>
+            </div>
+            <div id="preview-container">
+                <iframe id="preview-frame"></iframe>
+            </div>
+        </div>
+
+        <div id="ai-panel">
+            <div class="panel-header">🤖 NOMI AI <button class="secondary" id="btnAiFullscreen" style="float:right">⛶</button></div>
+            <div class="chat-history" id="chatHistory">
+                <div class="message ai">Selam! Ben <b>NOMI AI</b>. Projeni birlikte yönetelim. 🚀</div>
+            </div>
+            <div class="chat-input-area">
+                <div id="refFileBox" class="ref-file-box" style="display:none">
+                    <span id="refFileName"></span>
+                    <span id="btnClearRef">✖</span>
+                </div>
+                <select id="refSelect">
+                    <option value="">📎 Dosya Bağla...</option>
+                </select>
+                <div class="quick-actions">
+                    <button class="secondary" id="btnGitPush">GitHub Push</button>
+                    <button class="secondary" id="btnGitRepo">Repo Oluştur</button>
+                    <button class="secondary" id="btnGitPages">GitHub Pages</button>
+                </div>
+                <div style="display:flex; gap:4px;">
+                    <input id="userInput" placeholder="NOMI AI'ya talimat..." style="flex:1;">
+                    <button id="btnSendAi">Gönder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fullscreen-modal">
+        <div class="fs-header">
+            <span>🌐 Tam Ekran Önizleme</span>
+            <button class="secondary" id="btnCloseFs">❌ Kapat</button>
+        </div>
+        <iframe id="fs-preview-frame" style="flex:1;width:100%;border:0"></iframe>
+    </div>
+
+    <div id="aiSettingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">⚙️ NOMI AI Ayarları</div>
+            <p class="settings-note">Bir sağlayıcı seç, API anahtarını gir, modelini seç ve kaydet. GitHub için PAT veya OAuth Client ID kullanabilirsin; bu akış gerçek GitHub API ile çalışır.</p>
+            <div class="provider-grid" id="providerGrid"></div>
+            <div class="github-grid">
+                <div>
+                    <label>GitHub PAT</label>
+                    <input id="githubPat" type="password" placeholder="ghp_... veya github_pat_...">
+                </div>
+                <div>
+                    <label>GitHub Client ID (opsiyonel)</label>
+                    <input id="githubClientId" type="text" placeholder="GitHub OAuth client_id">
+                </div>
+                <div>
+                    <label>GitHub Owner</label>
+                    <input id="githubOwner" type="text" placeholder="kullanici-adiniz">
+                </div>
+                <div>
+                    <label>GitHub Repo</label>
+                    <input id="githubRepo" type="text" placeholder="yeni-repo-adi">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="secondary" id="btnConnectGithub">🔑 GitHub Bağlan</button>
+                <button class="secondary" id="btnCloseAiSettings">Kapat</button>
+                <button class="success" id="btnSaveAiSettings">💾 Ayarları Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="findReplaceModal" class="modal">
+        <div class="modal-content">
+            <h3>🔍 Ara ve Değiştir</h3>
+            <div class="modal-body">
+                <input id="searchInput" placeholder="Aranan metin">
+                <input id="replaceInput" placeholder="Yeni metin">
+            </div>
+            <div class="modal-footer">
+                <button id="btnFindAll">Tümünü Bul</button>
+                <button id="btnReplaceAll">Tümünü Değiştir</button>
+                <button class="secondary" id="btnCloseFindReplace">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PROVIDERS = {
+            gemini: { label: 'Google Gemini API', models: [['gemini-3.6-flash','Gemini 3.6 Flash'], ['gemini-3.5-flash','Gemini 3.5 Flash'], ['gemini-3.1-pro-preview','Gemini 3.1 Pro']] },
+            openai: { label: 'OpenAI ChatGPT', models: [['gpt-6-astra','GPT-6 Astra'], ['gpt-5.6-sol','GPT-5.6 Sol'], ['gpt-5.4-mini','GPT-5.4 mini']] },
+            anthropic: { label: 'Anthropic Claude', models: [['claude-opus-5','Claude Opus 5'], ['claude-sonnet-5','Claude Sonnet 5'], ['claude-haiku-4-5','Claude Haiku 4.5']] },
+            xai: { label: 'xAI Grok', models: [['grok-4.7','Grok 4.7'], ['grok-4.6','Grok 4.6'], ['grok-4.5','Grok 4.5']] },
+            deepseek: { label: 'DeepSeek', models: [['deepseek-v4-flash','DeepSeek V4 Flash'], ['deepseek-v4-pro','DeepSeek V4 Pro']] }
+        };
+
+        const LANGUAGE_MAP = { html:'html', css:'css', js:'javascript', json:'json', py:'python', java:'java', c:'c', cpp:'cpp', go:'go', rs:'rust', txt:'plaintext' };
+        const MEDIA_TYPES = { mp3:'audio', wav:'audio', m4a:'audio', mp4:'video', webm:'video', png:'image', jpg:'image', jpeg:'image' };
+        const BINARY_TYPES = ['zip','rar','exe','apk', '7z', 'tar', 'gz'];
+
+        let fileStructure = {
+            folders: { src: ['src/style.css', 'src/script.js'] },
+            files: {
+                'index.html': "<!DOCTYPE html>\n<html><head><meta charset='UTF-8'></head><body><h1>🍐 Armut Pen v7.1</h1><p>NOMI AI ile üret.</p></body></html>",
+                'src/style.css': 'body { background:#1e1e1e; color:#a6e22e; font-family:Arial; text-align:center; padding:50px; }',
+                'src/script.js': "console.log('Çalışıyor!');"
+            }
+        };
+
+        let activeFile = 'index.html';
+        let referenceFile = null;
+        let binaryFiles = {};
+        let consoleLogs = [];
+
+        const $ = (id) => document.getElementById(id);
+        const codeEditor = $('codeEditor');
+        const codeHighlight = $('highlightCode');
+        const fileTree = $('fileTree');
+        const tabsHeader = $('tabsHeader');
+        const refSelect = $('refSelect');
+        const consolePanel = $('consolePanel');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const savedStruct = localStorage.getItem('armut_v7_struct');
+                if (savedStruct) fileStructure = JSON.parse(savedStruct);
+            } catch (e) {}
+
+            bindUI();
+            loadSettingsIntoForm();
+            openFile(activeFile);
+            updateFileTree();
+            updateRefSelect();
+            setupConsoleInterception();
+        });
+
+        function bindUI() {
+            $('btnAiSettings').onclick = () => toggleModal('aiSettingsModal', true);
+            $('btnCloseAiSettings').onclick = () => toggleModal('aiSettingsModal', false);
+            $('btnSaveAiSettings').onclick = saveAiSettings;
+            $('btnConnectGithub').onclick = connectGitHub;
+            $('btnDownloadZip').onclick = downloadZip;
+            $('btnRefresh').onclick = runPreview;
+            $('btnAddFolder').onclick = createNewFolder;
+            $('btnAddFile').onclick = createNewFileRoot;
+            $('btnFullscreen').onclick = () => toggleFullscreen(true);
+            $('btnCloseFs').onclick = () => toggleFullscreen(false);
+            $('btnAiFullscreen').onclick = () => document.body.classList.toggle('ai-fullscreen');
+            $('btnSendAi').onclick = sendMessage;
+            $('btnGitPush').onclick = () => triggerGitHubAction('push');
+            $('btnGitRepo').onclick = () => triggerGitHubAction('create-repo');
+            $('btnGitPages').onclick = () => triggerGitHubAction('pages');
+            $('btnClearRef').onclick = clearReference;
+            $('btnImport').onclick = () => $('fileImport').click();
+            $('fileImport').onchange = handleImport;
+            $('btnTheme').onclick = () => document.body.classList.toggle('light-theme');
+            $('btnFindReplace').onclick = () => toggleModal('findReplaceModal', true);
+            $('btnCloseFindReplace').onclick = () => toggleModal('findReplaceModal', false);
+            $('btnFindAll').onclick = findAll;
+            $('btnReplaceAll').onclick = replaceAll;
+            $('searchFiles').oninput = filterFileTree;
+            $('userInput').onkeydown = (e) => { if (e.key === 'Enter') sendMessage(); };
+            refSelect.onchange = (e) => setReferenceFile(e.target.value);
+
+            codeEditor.oninput = () => {
+                fileStructure.files[activeFile] = codeEditor.value;
+                persist();
+                updateLineNumbers();
+                highlightCode();
+                runPreview();
+            };
+
+            codeEditor.onscroll = () => {
+                $('lineNumbers').scrollTop = codeEditor.scrollTop;
+                $('codeHighlight').scrollTop = codeEditor.scrollTop;
+            };
+
+            renderProviderSettings();
+        }
+
+        function toggleModal(id, show) {
+            $(id).classList.toggle('active', show);
+        }
+
+        function renderProviderSettings() {
+            const saved = JSON.parse(localStorage.getItem('nomi_ai_settings') || '{}');
+            $('providerGrid').innerHTML = Object.entries(PROVIDERS).map(([key, provider]) => {
+                const selectedModel = saved.models && saved.models[key] ? saved.models[key] : provider.models[0][0];
+                return `
+                    <div class="provider-card">
+                        <label><input type="radio" name="provider" value="${key}" ${saved.provider === key ? 'checked' : ''}> ${provider.label}</label>
+                        <input type="password" id="key-${key}" placeholder="API key" value="${saved.keys && saved.keys[key] ? saved.keys[key] : ''}">
+                        <select id="model-${key}">
+                            ${provider.models.map(([value, label]) => `<option value="${value}" ${selectedModel === value ? 'selected' : ''}>${label}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadSettingsIntoForm() {
+            const s = JSON.parse(localStorage.getItem('nomi_ai_settings') || '{}');
+            $('githubPat').value = s.githubPat || '';
+            $('githubClientId').value = s.githubClientId || '';
+            $('githubOwner').value = s.githubOwner || '';
+            $('githubRepo').value = s.githubRepo || '';
+        }
+
+        function saveAiSettings() {
+            const provider = document.querySelector('input[name=provider]:checked')?.value;
+            if (!provider) return alert('Bir AI sağlayıcısı seçin.');
+
+            const keys = {};
+            const models = {};
+            Object.keys(PROVIDERS).forEach((k) => {
+                keys[k] = $(`key-${k}`).value.trim();
+                models[k] = $(`model-${k}`).value;
+            });
+
+            if (!keys[provider]) return alert('Seçilen sağlayıcı için API anahtarı girin.');
+
+            const settings = {
+                provider,
+                keys,
+                models,
+                githubPat: $('githubPat').value.trim(),
+                githubClientId: $('githubClientId').value.trim(),
+                githubOwner: $('githubOwner').value.trim(),
+                githubRepo: $('githubRepo').value.trim()
+            };
+
+            localStorage.setItem('nomi_ai_settings', JSON.stringify(settings));
+            toggleModal('aiSettingsModal', false);
+            addMessage(`✅ ${PROVIDERS[provider].label} / ${models[provider]} hazır.`, 'ai');
+        }
+
+        function getSettings() {
+            return JSON.parse(localStorage.getItem('nomi_ai_settings') || '{}');
+        }
+
+        function setupConsoleInterception() {
+            const originalLog = console.log;
+            const originalError = console.error;
+            console.log = (...args) => {
+                consoleLogs.push({ type: 'log', content: args.join(' ') });
+                updateConsolePanel();
+                originalLog.apply(console, args);
+            };
+            console.error = (...args) => {
+                consoleLogs.push({ type: 'error', content: args.join(' ') });
+                updateConsolePanel();
+                originalError.apply(console, args);
+            };
+        }
+
+        function updateConsolePanel() {
+            consolePanel.innerHTML = consoleLogs.map(log => `<div class="console-log console-${log.type}">${escapeHtml(log.content)}</div>`).join('');
+            consolePanel.scrollTop = consolePanel.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function persist() {
+            localStorage.setItem('armut_v7_struct', JSON.stringify(fileStructure));
+        }
+
+        function updateLineNumbers() {
+            $('lineNumbers').innerHTML = codeEditor.value.split('\n').map((_, index) => (index + 1) + '<br>').join('');
+        }
+
+        function highlightCode() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            const lang = LANGUAGE_MAP[ext] || 'plaintext';
+            codeHighlight.textContent = codeEditor.value;
+            codeHighlight.className = `language-${lang}`;
+            hljs.highlightElement(codeHighlight);
+        }
+
+        function openFile(filepath) {
+            if (fileStructure.files[filepath] === undefined) return;
+            activeFile = filepath;
+            codeEditor.value = fileStructure.files[filepath];
+            updateLineNumbers();
+            highlightCode();
+            renderTabs();
+            updateFileTree();
+            runPreview();
+        }
+
+        function renderTabs() {
+            tabsHeader.innerHTML = Object.keys(fileStructure.files).map((filepath) => `
+                <div class="tab ${filepath === activeFile ? 'active' : ''}" data-tab="${filepath}">${filepath.split('/').pop()}</div>
+            `).join('');
+
+            tabsHeader.querySelectorAll('[data-tab]').forEach((el) => {
+                el.onclick = () => openFile(el.dataset.tab);
+            });
+        }
+
+        function updateFileTree() {
+            fileTree.innerHTML = '';
+
+            Object.keys(fileStructure.folders).forEach((folder) => {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'tree-item folder';
+                folderDiv.innerHTML = `<span>📁 ${folder}</span><span class="add-file-btn">➕</span>`;
+                folderDiv.onclick = (e) => {
+                    if (e.target.classList.contains('add-file-btn')) createNewFileInFolder(folder);
+                };
+                fileTree.appendChild(folderDiv);
+
+                const childBox = document.createElement('div');
+                childBox.className = 'folder-children';
+                (fileStructure.folders[folder] || []).forEach((childPath) => {
+                    const child = document.createElement('div');
+                    child.className = `tree-item ${childPath === activeFile ? 'active' : ''}`;
+                    child.innerHTML = `<span>📄 ${childPath.split('/').pop()}</span><span class="del-btn">✖</span>`;
+                    child.onclick = (e) => {
+                        if (e.target.classList.contains('del-btn')) return deleteItem(childPath);
+                        openFile(childPath);
+                    };
+                    childBox.appendChild(child);
+                });
+                fileTree.appendChild(childBox);
+            });
+
+            Object.keys(fileStructure.files).forEach((filepath) => {
+                const inFolder = Object.values(fileStructure.folders).some((arr) => arr.includes(filepath));
+                if (!inFolder) {
+                    const item = document.createElement('div');
+                    item.className = `tree-item ${filepath === activeFile ? 'active' : ''}`;
+                    item.innerHTML = `<span>📄 ${filepath}</span><span class="del-btn">✖</span>`;
+                    item.onclick = (e) => {
+                        if (e.target.classList.contains('del-btn')) return deleteItem(filepath);
+                        openFile(filepath);
+                    };
+                    fileTree.appendChild(item);
+                }
+            });
+        }
+
+        function updateRefSelect() {
+            refSelect.innerHTML = '<option value="">📎 Dosya Bağla...</option>' + Object.keys(fileStructure.files).map((filepath) => `<option value="${filepath}">${filepath}</option>`).join('');
+        }
+
+        function setReferenceFile(filepath) {
+            if (!filepath) return clearReference();
+            referenceFile = filepath;
+            $('refFileName').textContent = `📄 ${filepath}`;
+            $('refFileBox').style.display = 'flex';
+        }
+
+        function clearReference() {
+            referenceFile = null;
+            refSelect.value = '';
+            $('refFileBox').style.display = 'none';
+        }
+
+        function createNewFolder() {
+            const folderName = prompt('Yeni Klasör Adı:');
+            if (!folderName) return;
+            if (fileStructure.folders[folderName]) return alert('Bu klasör zaten var!');
+            fileStructure.folders[folderName] = [];
+            saveAndRefresh();
+        }
+
+        function createNewFileRoot() {
+            const fileName = prompt('Dosya Adı (örn: script.js):');
+            if (!fileName) return;
+            addFileToSystem(fileName);
+        }
+
+        function createNewFileInFolder(folderName) {
+            const fileName = prompt(`[${folderName}] klasörüne dosya adı:`);
+            if (!fileName) return;
+            const fullPath = `${folderName}/${fileName}`;
+            if (!fileStructure.folders[folderName]) fileStructure.folders[folderName] = [];
+            fileStructure.folders[folderName].push(fullPath);
+            addFileToSystem(fullPath);
+        }
+
+        function addFileToSystem(filepath) {
+            if (fileStructure.files[filepath] !== undefined) return;
+            fileStructure.files[filepath] = '';
+            saveAndRefresh();
+            openFile(filepath);
+        }
+
+        function deleteItem(filepath) {
+            if (!confirm('Dosyayı silmek istediğine emin misin?')) return;
+            delete fileStructure.files[filepath];
+            delete binaryFiles[filepath];
+            Object.keys(fileStructure.folders).forEach((folder) => {
+                fileStructure.folders[folder] = (fileStructure.folders[folder] || []).filter((x) => x !== filepath);
+            });
+            const next = Object.keys(fileStructure.files)[0];
+            if (next) openFile(next);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            persist();
+            updateFileTree();
+            updateRefSelect();
+            renderTabs();
+            runPreview();
+        }
+
+        function filterFileTree() {
+            const q = $('searchFiles').value.toLowerCase();
+            document.querySelectorAll('.tree-item').forEach((node) => {
+                node.style.display = node.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function downloadZip() {
+            if (typeof JSZip === 'undefined') return alert('JSZip yüklenemedi!');
+            const zip = new JSZip();
+            Object.keys(fileStructure.files).forEach((filepath) => zip.file(filepath, fileStructure.files[filepath]));
+            zip.generateAsync({ type: 'blob' }).then((content) => saveAs(content, 'armut-pen-proje.zip'));
+        }
+
+        function runPreview() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            if (MEDIA_TYPES[ext]) {
+                updateMediaPreview();
+                return;
+            }
+
+            let html = fileStructure.files['index.html'] || '';
+            Object.keys(fileStructure.files).forEach((path) => {
+                if (path.endsWith('.css')) html += `<style>${fileStructure.files[path]}</style>`;
+                if (path.endsWith('.js') && !path.includes('node_modules')) html += `<script>${fileStructure.files[path]}<\\/script>`;
+            });
+
+            try {
+                const frameDoc = $('preview-frame').contentDocument || $('preview-frame').contentWindow.document;
+                frameDoc.open();
+                frameDoc.write(html);
+                frameDoc.close();
+
+                const fsFrame = $('fs-preview-frame');
+                const fsDoc = fsFrame.contentDocument || fsFrame.contentWindow.document;
+                fsDoc.open();
+                fsDoc.write(html);
+                fsDoc.close();
+
+                $('previewTitle').textContent = '🌐 Canlı Önizleme';
+            } catch (e) {
+                console.error('Preview error:', e);
+            }
+        }
+
+        function updateMediaPreview() {
+            const ext = activeFile.split('.').pop().toLowerCase();
+            const mediaType = MEDIA_TYPES[ext];
+            if (!mediaType) return;
+
+            const player = document.createElement('div');
+            player.className = 'media-player';
+
+            if (mediaType === 'audio') {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = `data:audio/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                player.appendChild(audio);
+            } else if (mediaType === 'video') {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.src = `data:video/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                player.appendChild(video);
+            } else if (mediaType === 'image') {
+                const imgWrap = document.createElement('div');
+                imgWrap.className = 'media-viewer';
+                const img = document.createElement('img');
+                img.src = `data:image/${ext};base64,${btoa(fileStructure.files[activeFile])}`;
+                imgWrap.appendChild(img);
+                player.appendChild(imgWrap);
+            }
+
+            $('preview-container').innerHTML = '';
+            $('preview-container').appendChild(player);
+            $('previewTitle').textContent = `${activeFile}`;
+        }
+
+        function toggleFullscreen(show) {
+            $('fullscreen-modal').classList.toggle('active', show);
+            if (show) runPreview();
+        }
+
+        async function handleImport(e) {
+            const files = e.target.files;
+            for (const file of files) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (BINARY_TYPES.includes(ext) || file.type.startsWith('image/') || file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        binaryFiles[file.name] = event.target.result;
+                        fileStructure.files[file.name] = `[Binary: ${ext.toUpperCase()}] - ${file.size} bytes`;
+                        saveAndRefresh();
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        fileStructure.files[file.name] = event.target.result;
+                        saveAndRefresh();
+                    };
+                    reader.readAsText(file);
+                }
+            }
+            e.target.value = '';
+        }
+
+        function addMessage(text, sender) {
+            const chatHistory = $('chatHistory');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerHTML = text;
+            chatHistory.appendChild(msgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = $('userInput');
+            const prompt = input.value.trim();
+            const s = getSettings();
+
+            if (!prompt) return;
+            if (!s.provider || !s.keys?.[s.provider]) {
+                return alert('Önce NOMI AI Ayarları bölümünden sağlayıcı, API key ve modeli seçin.');
+            }
+
+            addMessage(prompt, 'user');
+            input.value = '';
+
+            const loading = document.createElement('div');
+            loading.className = 'message ai';
+            loading.textContent = '⚡️ NOMI AI çalışıyor...';
+            $('chatHistory').appendChild(loading);
+
+            const project = JSON.stringify(fileStructure).substring(0, 12000);
+            const refs = referenceFile ? `\nREFERANS DOSYASI:\n${fileStructure.files[referenceFile].substring(0, 2000)}` : '';
+            const system = `Sen NOMI AI'sın. Girdileri güvenli şekilde yönet. JSON döndür: {"summary":"...","updateFiles":{},"action":null}. PROJE:${project} İSTEK:${prompt}${refs}`;
+
+            try {
+                const raw = await callProvider(s, system);
+                const clean = raw.replace(/```json|```/g, '').trim();
+                const aiAction = JSON.parse(clean);
+
+                if (aiAction.updateFiles) {
+                    Object.entries(aiAction.updateFiles).forEach(([path, content]) => {
+                        fileStructure.files[path] = content;
+                    });
+                }
+
+                saveAndRefresh();
+
+                if (aiAction.action === 'create-repo') {
+                    loading.innerHTML = `✅ <b>${escapeHtml(aiAction.summary || 'Tamamlandı')}</b><br><button class="secondary" onclick="window.triggerGithubAction('create-repo')">GitHub Repo Oluştur</button>`;
+                } else if (aiAction.action === 'push') {
+                    loading.innerHTML = `✅ <b>${escapeHtml(aiAction.summary || 'Tamamlandı')}</b><br><button class="secondary" onclick="window.triggerGithubAction('push')">GitHub Push</button>`;
+                } else if (aiAction.action === 'pages') {
+                    loading.innerHTML = `✅ <b>${escapeHtml(aiAction.summary || 'Tamamlandı')}</b><br><button class="secondary" onclick="window.triggerGithubAction('pages')">GitHub Pages</button>`;
+                } else {
+                    loading.innerHTML = `✅ <b>${escapeHtml(aiAction.summary || 'Tamamlandı')}</b>`;
+                }
+            } catch (e) {
+                loading.textContent = '⚠️ ' + e.message;
+            }
+        }
+
+        async function callProvider(settings, prompt) {
+            const provider = settings.provider;
+            const key = settings.keys[provider];
+            const model = settings.models[provider];
+
+            if (provider === 'gemini') {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            }
+
+            if (provider === 'anthropic') {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': key,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({ model, max_tokens: 4096, messages: [{ role: 'user', content: prompt }] })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.content?.[0]?.text || '';
+            }
+
+            if (provider === 'openai' || provider === 'xai' || provider === 'deepseek') {
+                const base = provider === 'openai' ? 'https://api.openai.com/v1/chat/completions' : provider === 'xai' ? 'https://api.x.ai/v1/chat/completions' : 'https://api.deepseek.com/chat/completions';
+                const response = await fetch(base, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${key}`
+                    },
+                    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.choices?.[0]?.message?.content || '';
+            }
+
+            throw new Error('Desteklenmeyen sağlayıcı.');
+        }
+
+        function findAll() {
+            const q = $('searchInput').value;
+            if (!q) return alert('Aranan metni gir.');
+            alert(`${(codeEditor.value.split(q).length - 1)} eşleşme bulundu.`);
+        }
+
+        function replaceAll() {
+            const q = $('searchInput').value;
+            if (!q) return;
+            codeEditor.value = codeEditor.value.split(q).join($('replaceInput').value);
+            codeEditor.dispatchEvent(new Event('input'));
+            toggleModal('findReplaceModal', false);
+        }
+
+        function connectGitHub() {
+            const settings = getSettings();
+            const clientId = settings.githubClientId || $('githubClientId').value.trim();
+            if (!clientId) return alert('GitHub OAuth Client ID gir veya PAT kutusunu doldur.');
+            const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+            const state = encodeURIComponent(Date.now().toString(36));
+            const authUrl = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${redirectUri}&scope=repo,workflow&state=${state}`;
+            window.open(authUrl, '_blank', 'width=600,height=700');
+            alert('GitHub yetkilendirme sayfası açıldı. İşlem sonrası sayfada "code" parametresi görünürse localStorage içinde saklanır.');
+        }
+
+        async function triggerGitHubAction(action) {
+            const settings = getSettings();
+            const githubPat = settings.githubPat || $('githubPat').value.trim();
+            const owner = settings.githubOwner || $('githubOwner').value.trim();
+            const repo = settings.githubRepo || $('githubRepo').value.trim();
+
+            if (!githubPat) return alert('GitHub PAT eksik. AI Ayarları bölümünden ekleyin.');
+            if (!owner || !repo) return alert('GitHub owner ve repo alanlarını doldur.');
+
+            try {
+                if (action === 'create-repo') {
+                    const response = await fetch('https://api.github.com/user/repos', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${githubPat}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: repo, private: false, auto_init: false })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'Repo oluşturma hatası');
+                    addMessage(`✅ GitHub repo oluşturuldu: ${data.full_name}`, 'ai');
+                    return;
+                }
+
+                if (action === 'push') {
+                    const repoName = repo || 'armut-pen-repo';
+                    const repoUrl = `https://api.github.com/repos/${owner}/${repoName}`;
+                    const exists = await fetch(repoUrl, { headers: { 'Authorization': `token ${githubPat}`, 'Accept': 'application/vnd.github+json' } });
+                    if (!exists.ok) {
+                        const created = await fetch('https://api.github.com/user/repos', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `token ${githubPat}`,
+                                'Accept': 'application/vnd.github+json',
+                                'X-GitHub-Api-Version': '2022-11-28',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name: repoName, private: false, auto_init: false })
+                        });
+                        const createdData = await created.json();
+                        if (!created.ok) throw new Error(createdData.message || 'Repo oluşturma hatası');
+                    }
+
+                    for (const [path, content] of Object.entries(fileStructure.files)) {
+                        const encoded = btoa(unescape(encodeURIComponent(content)));
+                        const uploadResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}/contents/${encodeURIComponent(path)}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `token ${githubPat}`,
+                                'Accept': 'application/vnd.github+json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message: `Update ${path}`, content: encoded })
+                        });
+                        const uploadData = await uploadResponse.json();
+                        if (!uploadResponse.ok) throw new Error(uploadData.message || 'Upload hatası');
+                    }
+
+                    addMessage(`✅ Proje GitHub'a yüklendi: ${owner}/${repoName}`, 'ai');
+                    return;
+                }
+
+                if (action === 'pages') {
+                    const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${githubPat}`,
+                            'Accept': 'application/vnd.github+json',
+                            'X-GitHub-Api-Version': '2022-11-28',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ source: { branch: 'main', path: '/' } })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message || 'GitHub Pages başlatılamadı');
+                    addMessage(`✅ GitHub Pages yayın işlemi başlatıldı: ${owner}/${repo}`, 'ai');
+                    return;
+                }
+            } catch (err) {
+                addMessage(`⚠️ GitHub işlem hatası: ${err.message}`, 'ai');
+            }
+        }
+
+        window.triggerGithubAction = triggerGitHubAction;
+    </script>
+</body>
+</html>
