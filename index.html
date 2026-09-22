@@ -1,38 +1,586 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen</title>
-    <meta name="description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür.">
-    <meta name="application-name" content="Armut Pen">
-    <meta name="apple-mobile-web-app-title" content="Armut Pen">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="Armut Pen">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="tr_TR">
-    <meta property="og:site_name" content="Armut Pen">
-    <meta property="og:title" content="Armut Pen">
-    <meta property="og:description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür.">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Armut Pen">
-    <meta name="twitter:description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür.">
-    <link rel="icon" type="image/jpeg" href="https://i.hizliresim.com/mgagalq6.jpg">
-    <link rel="shortcut icon" type="image/jpeg" href="https://i.hizliresim.com/mgagalq6.jpg">
-    <link rel="apple-touch-icon" href="https://i.hizliresim.com/mgagalq6.jpg">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #1e1e1e; color: #d4d4d4; min-height: 100vh; display: grid; place-items: center; }
-        h1 { color: #a6e22e; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Armut Pen</title>
+  <meta name="description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür." />
+  <meta name="application-name" content="Armut Pen" />
+  <meta name="apple-mobile-web-app-title" content="Armut Pen" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Armut Pen" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="tr_TR" />
+  <meta property="og:site_name" content="Armut Pen" />
+  <meta property="og:title" content="Armut Pen" />
+  <meta property="og:description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Armut Pen" />
+  <meta name="twitter:description" content="Armut Pen, NOMI AI destekli modern bir çevrim içi kod editörüdür." />
+  <link rel="icon" type="image/jpeg" href="https://i.hizliresim.com/mgagalq6.jpg" />
+  <link rel="shortcut icon" type="image/jpeg" href="https://i.hizliresim.com/mgagalq6.jpg" />
+  <link rel="apple-touch-icon" href="https://i.hizliresim.com/mgagalq6.jpg" />
+  <style>
+    :root {
+      --bg: #1e1e1e;
+      --panel: #252526;
+      --panel-2: #2d2d2d;
+      --panel-3: #333333;
+      --line: #3c3c3c;
+      --text: #e9e9e9;
+      --muted: #9aa0a6;
+      --primary: #1c8c5c;
+      --accent: #a6e22e;
+      --soft: #5bc0eb;
+      --danger: #ff5f57;
+      --shadow: rgba(0,0,0,0.25);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    body.light {
+      --bg: #f2f2f2;
+      --panel: #ffffff;
+      --panel-2: #ececec;
+      --panel-3: #e0e0e0;
+      --line: #d0d0d0;
+      --text: #1f1f1f;
+      --muted: #4f5a67;
+      --primary: #117a58;
+      --accent: #82b817;
+      --soft: #1d7af2;
+      --shadow: rgba(0,0,0,0.08);
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--bg);
+    }
+
+    .topbar {
+      height: 52px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--accent);
+      font-size: 15px;
+    }
+
+    .brand-badge {
+      background: rgba(166, 226, 46, 0.14);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 10px;
+      border: 1px solid rgba(166, 226, 46, 0.35);
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--panel-3);
+      color: var(--text);
+      padding: 7px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover { filter: brightness(1.08); }
+    button.primary { background: var(--primary); border-color: transparent; }
+    button.success { background: #238636; border-color: transparent; }
+    button.warn { background: #a05d00; border-color: transparent; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 220px 1.4fr 1fr 310px;
+      height: calc(100vh - 52px);
+      min-height: 0;
+    }
+
+    .sidebar, .panel, .chat-panel {
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      min-height: 0;
+    }
+
+    .sidebar-header, .panel-header {
+      height: 40px;
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .search-box {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .search-box input {
+      width: 100%;
+      background: #2d2d2d;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 8px 9px;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .file-tree {
+      padding: 8px 0;
+      overflow: auto;
+      height: calc(100% - 82px);
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .tree-item:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .tree-item.active {
+      background: rgba(166, 226, 46, 0.08);
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+    }
+
+    .tree-item.folder {
+      font-weight: 700;
+      color: #efb14f;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      height: 38px;
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .tab {
+      padding: 10px 12px;
+      border-right: 1px solid var(--line);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted);
+      min-width: max-content;
+    }
+
+    .tab.active {
+      background: var(--bg);
+      color: var(--text);
+      border-top: 2px solid var(--primary);
+      padding-top: 8px;
+    }
+
+    .editor-wrap {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .line-numbers {
+      background: rgba(0,0,0,0.08);
+      color: #7a7a7a;
+      font: 12px/1.5 Consolas, monospace;
+      padding: 10px 6px 10px 0;
+      text-align: right;
+      overflow: hidden;
+      border-right: 1px solid var(--line);
+      user-select: none;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      resize: none;
+      border: 0;
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+      font: 12px/1.5 Consolas, monospace;
+      padding: 10px 12px;
+    }
+
+    .console {
+      height: 120px;
+      background: #1a1a1a;
+      border-top: 1px solid var(--line);
+      padding: 8px 10px;
+      font: 11px/1.5 Consolas, monospace;
+      color: #d3d3d3;
+      overflow: auto;
+    }
+
+    .preview-panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .preview-area {
+      flex: 1;
+      background: white;
+      min-height: 0;
+    }
+
+    .preview-area iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: white;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      border-right: 0;
+    }
+
+    .messages {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg {
+      max-width: 92%;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .msg.user { align-self: flex-end; background: var(--primary); color: white; }
+    .msg.ai { align-self: flex-start; background: var(--panel-3); border: 1px solid var(--line); }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .composer-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .composer input {
+      flex: 1;
+      background: rgba(0,0,0,0.08);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1100px) {
+      .workspace {
+        grid-template-columns: 180px 1fr 1fr 240px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <main>
-        <h1>Armut Pen</h1>
-    </main>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span>🍐</span>
+        <span>Armut Pen</span>
+        <span class="brand-badge">NOMI AI</span>
+      </div>
+      <div class="top-actions">
+        <button>⚙️ AI Ayarları</button>
+        <button>📁 İçe Aktar</button>
+        <button class="success">📦 ZIP İndir</button>
+        <button>🔍 Ara</button>
+        <button id="themeToggle">🌙 Tema</button>
+        <button class="primary">🔄</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <span>📁 Dosyalar</span>
+          <div>
+            <button>📁+</button>
+            <button>📄+</button>
+          </div>
+        </div>
+        <div class="search-box">
+          <input type="text" value="" placeholder="Dosyalarda ara..." />
+        </div>
+        <div class="file-tree" id="fileTree"></div>
+      </aside>
+
+      <main class="panel">
+        <div class="tabs" id="tabs"></div>
+        <div class="editor-wrap">
+          <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+          <textarea id="editor" spellcheck="false"></textarea>
+        </div>
+        <div class="console" id="console">Konsol hazır.</div>
+      </main>
+
+      <section class="preview-panel">
+        <div class="panel-header">
+          <span>🌐 Canlı Önizleme</span>
+          <button>⛶ Tam Ekran</button>
+        </div>
+        <div class="preview-area">
+          <iframe id="previewFrame" title="preview"></iframe>
+        </div>
+      </section>
+
+      <aside class="chat-panel">
+        <div class="panel-header">
+          <span>🤖 NOMI AI</span>
+          <button>⛶</button>
+        </div>
+        <div class="messages" id="messages">
+          <div class="msg ai">Selam! Ben NOMI AI. Projeni birlikte yönetelim. 🚀</div>
+        </div>
+        <div class="composer">
+          <div class="quick-actions">
+            <button class="warn">GitHub Push</button>
+            <button>Repo Oluştur</button>
+            <button>GitHub Pages</button>
+          </div>
+          <div class="composer-row">
+            <input type="text" id="promptInput" placeholder="NOMI AI'ya talimat..." />
+            <button class="primary" id="sendBtn">Gönder</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const files = {
+      'index.html': `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Armut Pen</title>
+    <style>
+      body {
+        background: #111827;
+        color: #d1fae5;
+        font-family: Arial, sans-serif;
+        display: grid;
+        place-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      h1 {
+        color: #a3e635;
+        font-size: 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Armut Pen</h1>
+  </body>
+</html>`,
+      'src/style.css': `body {
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: Arial, sans-serif;
+  padding: 40px;
+}`,
+      'src/script.js': `console.log('Armut Pen çalışıyor!');`
+    };
+
+    const folderStructure = {
+      src: ['src/style.css', 'src/script.js']
+    };
+
+    let activeFile = 'index.html';
+    let currentText = files[activeFile];
+    const editor = document.getElementById('editor');
+    const fileTree = document.getElementById('fileTree');
+    const tabs = document.getElementById('tabs');
+    const previewFrame = document.getElementById('previewFrame');
+    const lineNumbers = document.getElementById('lineNumbers');
+    const consoleEl = document.getElementById('console');
+    const messages = document.getElementById('messages');
+    const themeToggle = document.getElementById('themeToggle');
+
+    function renderTree() {
+      const html = [];
+
+      Object.keys(folderStructure).forEach(folder => {
+        html.push(`<div class="tree-item folder"><span>📁 ${folder}</span><span>+</span></div>`);
+        (folderStructure[folder] || []).forEach(file => {
+          const active = file === activeFile ? 'active' : '';
+          html.push(`<div class="tree-item ${active}" data-file="${file}"><span>📄 ${file.split('/').pop()}</span><span>✖</span></div>`);
+        });
+      });
+
+      Object.keys(files).forEach(file => {
+        const inFolder = Object.values(folderStructure).some(arr => arr.includes(file));
+        if (!inFolder) {
+          const active = file === activeFile ? 'active' : '';
+          html.push(`<div class="tree-item ${active}" data-file="${file}"><span>📄 ${file}</span><span>✖</span></div>`);
+        }
+      });
+
+      fileTree.innerHTML = html.join('');
+      fileTree.querySelectorAll('[data-file]').forEach(item => {
+        item.addEventListener('click', () => {
+          activeFile = item.dataset.file;
+          currentText = files[activeFile];
+          editor.value = currentText;
+          updateLineNumbers();
+          updatePreview();
+          renderTabs();
+          renderTree();
+        });
+      });
+    }
+
+    function renderTabs() {
+      tabs.innerHTML = Object.keys(files).map(file => `
+        <div class="tab ${file === activeFile ? 'active' : ''}" data-file="${file}">${file.split('/').pop()}</div>
+      `).join('');
+
+      tabs.querySelectorAll('[data-file]').forEach(tab => {
+        tab.addEventListener('click', () => {
+          activeFile = tab.dataset.file;
+          currentText = files[activeFile];
+          editor.value = currentText;
+          updateLineNumbers();
+          updatePreview();
+          renderTabs();
+          renderTree();
+        });
+      });
+    }
+
+    function updateLineNumbers() {
+      const total = Math.max(1, (editor.value || '').split('\n').length);
+      const lines = Array.from({ length: total }, (_, i) => i + 1).join('<br>');
+      lineNumbers.innerHTML = lines;
+    }
+
+    function updatePreview() {
+      const html = files['index.html'] || '';
+      const css = files['src/style.css'] || '';
+      const js = files['src/script.js'] || '';
+      const fullDoc = `
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="UTF-8" />
+            <style>${css}</style>
+          </head>
+          <body>
+            ${html.includes('<body>') ? html.split('<body>')[1].split('</body>')[0] : html}
+            <script>${js}<\/script>
+          </body>
+        </html>`;
+      previewFrame.srcdoc = fullDoc;
+    }
+
+    editor.value = currentText;
+    editor.addEventListener('input', () => {
+      files[activeFile] = editor.value;
+      currentText = editor.value;
+      updateLineNumbers();
+      updatePreview();
+      consoleEl.innerHTML = 'Değişiklik kaydedildi: ' + activeFile;
+    });
+
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const input = document.getElementById('promptInput');
+      const value = input.value.trim();
+      if (!value) return;
+      messages.insertAdjacentHTML('beforeend', `<div class="msg user">${value}</div>`);
+      messages.insertAdjacentHTML('beforeend', `<div class="msg ai">NOMI AI: İsteğiniz işlendi. Armut Pen düzenleme modülüne göre devam ediyorum.</div>`);
+      messages.scrollTop = messages.scrollHeight;
+      input.value = '';
+    });
+
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light');
+    });
+
+    renderTree();
+    renderTabs();
+    updateLineNumbers();
+    updatePreview();
+  </script>
 </body>
 </html>
