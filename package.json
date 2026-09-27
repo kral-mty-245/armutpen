@@ -1,0 +1,13 @@
+{
+  "name": "armut-pen",
+  "private": true,
+  "type": "module",
+  "scripts": {"dev": "vite --host 0.0.0.0", "build": "vite build"},
+  "dependencies": {
+    "acorn": "8.14.1",
+    "highlight.js": "11.11.1",
+    "jszip": "3.10.1",
+    "prettier": "3.5.3"
+  },
+  "devDependencies": {"vite": "6.3.5"}
+}
