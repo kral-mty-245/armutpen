@@ -1,0 +1,56 @@
+services:
+  migrate:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - armut-data:/data
+      - pip-cache:/root/.cache/pip
+    environment:
+      DB_PATH: /data/armut.sqlite3
+    command: sh -c "pip install -r server/requirements.txt && python -m server.db"
+  api:
+    image: python:3.12-slim
+    restart: on-failure
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - armut-data:/data
+      - pip-cache:/root/.cache/pip
+    environment:
+      DB_PATH: /data/armut.sqlite3
+      COOKIE_SECURE: "true"
+    command: sh -c "pip install -r server/requirements.txt && uvicorn server.main:app --host 0.0.0.0 --port 8000 --reload"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/models', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+  web:
+    image: node:22-slim
+    restart: on-failure
+    working_dir: /app
+    ports: ["3000:3000"]
+    volumes:
+      - ./:/app
+      - node-modules:/app/node_modules
+    environment:
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    command: sh -c "npm install --no-audit --no-fund && npm run dev"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+volumes:
+  armut-data:
+  node-modules:
+  pip-cache:
