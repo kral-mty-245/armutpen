@@ -1,14 +1,7 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Armut Pen v7.1 - Professional Code Editor</title>
-    <meta name="description" content="Armut Pen v7.1 - Multi-language code editor with NOMI AI, media player, ZIP viewer, syntax highlighting, and more.">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armut Pen — NOMI AI Çalışma Alanı</title>
+<meta name="description" content="Özel projelerin, kod editörün ve NOMI AI çalışma alanın.">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { --primary: #0e639c; --success: #28a745; --danger: #ff5555; --bg-dark: #1e1e1e; --bg-light: #252526; --text: #d4d4d4; }
@@ -89,138 +82,28 @@
         body.light-theme { --bg-dark:#f5f5f5; --bg-light:#fff; --text:#333; }
         body.light-theme textarea#codeEditor { caret-color:#111; }
     </style>
-</head>
-<body>
-    <header>
-        <div class="logo">🍐 Armut Pen <span>NOMI AI</span></div>
-        <div class="actions">
-            <button class="secondary" id="btnAiSettings">⚙️ AI Ayarları</button>
-            <input type="file" id="fileImport" accept=".zip,.rar,.html,.css,.js,.py,.java,.c,.cpp,.go,.rs,.json,.mp3,.mp4,.wav,.m4a,.png,.jpg,.jpeg,.txt" multiple hidden>
-            <button class="secondary" id="btnImport">📂 İçe Aktar</button>
-            <button class="success" id="btnDownloadZip">📦 ZIP İndir</button>
-            <button class="secondary" id="btnFindReplace">🔍 Ara</button>
-            <button class="secondary" id="btnTheme">🌙 Tema</button>
-            <button id="btnRefresh">🔄</button>
-        </div>
-    </header>
-
-    <div class="workspace">
-        <div id="sidebar">
-            <div class="sidebar-header">
-                <span>📁 DOSYALAR</span>
-                <div class="tree-actions">
-                    <button id="btnAddFolder">📁+</button>
-                    <button id="btnAddFile">📄+</button>
-                </div>
-            </div>
-            <div class="search-box">
-                <input id="searchFiles" placeholder="Dosyalarda ara...">
-            </div>
-            <div class="file-tree" id="fileTree"></div>
-        </div>
-
-        <div id="editor-panel">
-            <div class="tabs" id="tabsHeader"></div>
-            <div class="editor-wrapper">
-                <div class="line-numbers" id="lineNumbers">1</div>
-                <div class="code-editor-wrapper">
-                    <textarea id="codeEditor" spellcheck="false"></textarea>
-                    <pre id="codeHighlight"><code id="highlightCode"></code></pre>
-                </div>
-            </div>
-            <div class="console-panel" id="consolePanel"></div>
-        </div>
-
-        <div id="preview-panel">
-            <div class="panel-header">
-                <span id="previewTitle">🌐 Canlı Önizleme</span>
-                <button class="secondary" id="btnFullscreen">⛶ Tam Ekran</button>
-            </div>
-            <div id="preview-container">
-                <iframe id="preview-frame"></iframe>
-            </div>
-        </div>
-
-        <div id="ai-panel">
-            <div class="panel-header">🤖 NOMI AI <button class="secondary" id="btnAiFullscreen" style="float:right">⛶</button></div>
-            <div class="chat-history" id="chatHistory">
-                <div class="message ai">Selam! Ben <b>NOMI AI</b>. Projeni birlikte yönetelim. 🚀</div>
-            </div>
-            <div class="chat-input-area">
-                <div id="refFileBox" class="ref-file-box" style="display:none">
-                    <span id="refFileName"></span>
-                    <span id="btnClearRef">✖</span>
-                </div>
-                <select id="refSelect">
-                    <option value="">📎 Dosya Bağla...</option>
-                </select>
-                <div class="quick-actions">
-                    <button class="secondary" id="btnGitPush">GitHub Push</button>
-                    <button class="secondary" id="btnGitRepo">Repo Oluştur</button>
-                    <button class="secondary" id="btnGitPages">GitHub Pages</button>
-                </div>
-                <div style="display:flex; gap:4px;">
-                    <input id="userInput" placeholder="NOMI AI'ya talimat..." style="flex:1;">
-                    <button id="btnSendAi">Gönder</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="fullscreen-modal">
-        <div class="fs-header">
-            <span>🌐 Tam Ekran Önizleme</span>
-            <button class="secondary" id="btnCloseFs">❌ Kapat</button>
-        </div>
-        <iframe id="fs-preview-frame" style="flex:1;width:100%;border:0"></iframe>
-    </div>
-
-    <div id="aiSettingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">⚙️ NOMI AI Ayarları</div>
-            <p class="settings-note">Bir sağlayıcı seç, API anahtarını gir, modelini seç ve kaydet. GitHub için gereken gerçek erişim güvenli OAuth ile yapılır; PAT yalnızca yedek/o... </p>
-            <div class="provider-grid" id="providerGrid"></div>
-            <div class="github-grid">
-                <div>
-                    <label>GitHub PAT (opsiyonel yedek)</label>
-                    <input id="githubPat" type="password" placeholder="ghp_... veya github_pat_...">
-                </div>
-                <div>
-                    <label>GitHub Client ID (OAuth)</label>
-                    <input id="githubClientId" type="text" placeholder="GitHub OAuth client_id">
-                </div>
-                <div>
-                    <label>GitHub Owner</label>
-                    <input id="githubOwner" type="text" placeholder="kullanici-adiniz">
-                </div>
-                <div>
-                    <label>GitHub Repo</label>
-                    <input id="githubRepo" type="text" placeholder="yeni-repo-adi">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="secondary" id="btnConnectGithub">🔑 GitHub OAuth ile Bağlan</button>
-                <button class="secondary" id="btnCloseAiSettings">Kapat</button>
-                <button class="success" id="btnSaveAiSettings">💾 Ayarları Kaydet</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="findReplaceModal" class="modal">
-        <div class="modal-content">
-            <h3>🔍 Ara ve Değiştir</h3>
-            <div class="modal-body">
-                <input id="searchInput" placeholder="Aranan metin">
-                <input id="replaceInput" placeholder="Yeni metin">
-            </div>
-            <div class="modal-footer">
-                <button id="btnFindAll">Tümünü Bul</button>
-                <button id="btnReplaceAll">Tümünü Değiştir</button>
-                <button class="secondary" id="btnCloseFindReplace">Kapat</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-</body>
-</html>
+<link rel="stylesheet" href="/workspace.css"></head>
+<body class="locked" data-mode="half">
+<header>
+ <div class="brand-modes"><div class="logo">🍐 Armut Pen <span>NOMI AI</span></div>
+ <nav class="mode-tabs" aria-label="Çalışma modu"><button data-mode="ai" aria-pressed="false">AI MODU</button><button data-mode="half" aria-pressed="true">Yarım AI MODU</button><button data-mode="code" aria-pressed="false">KOD YAZMA CANAVARI</button></nav></div>
+ <div class="actions"><button class="secondary" id="btnAiSettings">⚙️ AI Ayarları</button>
+ <input type="file" id="fileImport" accept=".html,.css,.js,.py,.java,.c,.cpp,.go,.rs,.json,.mp3,.mp4,.wav,.m4a,.png,.jpg,.jpeg,.txt" multiple hidden>
+ <button class="secondary" id="btnImport">📂 İçe Aktar</button><button class="success" id="btnDownloadZip">📦 ZIP İndir</button><button class="secondary" id="btnFindReplace">🔍 Ara</button><button class="secondary" id="btnTheme">🌙 Tema</button><button id="btnRefresh" aria-label="Önizlemeyi yenile">🔄</button></div>
+</header>
+<div class="project-bar"><select id="projectSelect" aria-label="Projelerim"></select><button id="btnNewProject">+ Proje</button><button class="secondary" id="btnRenameProject">Adlandır</button><span id="saveStatus" role="status">Yükleniyor…</span><span id="credits" title="Her gün İstanbul saatine göre 00:00’da 20 kredi">20 / 20 kredi</span><span id="accountEmail"></span><button class="secondary" id="btnLogout">Çıkış</button></div>
+<main class="workspace">
+ <aside id="sidebar"><div class="sidebar-header"><span>📁 DOSYALAR</span><div class="tree-actions"><button id="btnAddFolder" title="Klasör ve dosya oluştur">📁+</button><button id="btnAddFile" title="Dosya oluştur">📄+</button></div></div><div class="search-box"><input id="searchFiles" aria-label="Dosyalarda ara" placeholder="Dosyalarda ara..."></div><div class="file-tree" id="fileTree"></div></aside>
+ <section id="editor-panel" aria-label="Kod editörü"><div class="editor-tools"><button id="btnRenameFile">Dosya adı</button><button id="btnFormat">Biçimlendir</button><button id="btnCheck">Hata kontrolü</button><button id="btnTemplates">Şablonlar</button><button id="btnVersions">Sürümler</button></div><div class="tabs" id="tabsHeader"></div><div class="editor-wrapper"><div class="line-numbers" id="lineNumbers">1</div><div class="code-editor-wrapper"><textarea id="codeEditor" aria-label="Kod" spellcheck="false"></textarea><pre id="codeHighlight"><code id="highlightCode"></code></pre></div></div><div class="console-panel" id="consolePanel" role="log"></div></section>
+ <section id="preview-panel" aria-label="Canlı önizleme"><div class="panel-header"><span id="previewTitle">🌐 Canlı Önizleme</span><button class="secondary" id="btnEditProject">Düzenle</button><button class="secondary" id="btnFullscreen">⛶</button></div><div id="preview-container"><iframe id="preview-frame" title="Proje önizlemesi" sandbox="allow-scripts allow-modals" referrerpolicy="no-referrer"></iframe></div></section>
+ <section id="ai-panel" aria-label="NOMI AI"><div class="panel-header"><span>🤖 NOMI AI</span><button class="secondary" id="btnAiFullscreen" aria-label="AI moduna geç">⛶</button><select id="modelSelect" aria-label="AI modeli"></select></div><div class="chat-history" id="chatHistory" role="log"></div><div class="chat-input-area"><div id="pendingAction" hidden><span id="pendingLabel"></span> <button id="btnPendingAction">Devam et</button></div><div id="refFileBox" class="ref-file-box" hidden><span id="refFileName"></span><button id="btnClearRef" aria-label="Referansı kaldır">×</button></div><select id="refSelect" aria-label="Referans dosya"><option value="">📎 Dosya Bağla...</option></select><div class="quick-actions"><button class="secondary" id="btnGitPush">GitHub Push</button><button class="secondary" id="btnGitRepo">Repo Oluştur</button><button class="secondary" id="btnGitPages">GitHub Pages</button></div><textarea id="userInput" aria-label="NOMI AI mesajı" placeholder="NOMI AI'ya talimat… (Shift+Enter: yeni satır)" maxlength="12000"></textarea><button id="btnSendAi">Gönder</button></div></section>
+</main>
+<div id="fullscreen-modal"><div class="fs-header"><span>🌐 Tam Ekran Önizleme</span><button class="secondary" id="btnCloseFs">Kapat</button></div><iframe id="fs-preview-frame" title="Tam ekran önizleme" sandbox="allow-scripts allow-modals" referrerpolicy="no-referrer" style="flex:1;width:100%;border:0"></iframe></div>
+<div id="authModal" class="modal active" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-content auth-card"><h1>🍐 Armut Pen</h1><p>Kendi alanın. Kendi fikirlerin.<br>Kodla, NOMI AI ile üret ve projelerini sakla.</p><h2 id="authTitle">Tekrar hoş geldin</h2><form id="authForm" class="stack-form"><label>E-posta<input id="authEmail" type="email" required autocomplete="email" maxlength="254"></label><label>Şifre<input id="authPassword" type="password" required minlength="10" maxlength="256" autocomplete="current-password" placeholder="En az 10 karakter"></label><div id="authError" class="form-error" role="alert"></div><button id="authSubmit" type="submit">Giriş yap</button><button id="authToggle" type="button" class="secondary">Hesabın yok mu? Kayıt ol</button></form><details style="margin-top:18px"><summary style="cursor:pointer;font-size:12px">GitHub tokenıyla devam et</summary><form id="githubLoginForm" class="stack-form" style="margin-top:14px"><label>GitHub PAT<input id="githubLoginToken" type="password" required autocomplete="off" maxlength="1024"></label><small>Doğrulanmış e-postanı okuyabilen bir token kullan (user:email / Email addresses: read). Bu OAuth değildir; token saklanmaz.</small><button type="submit" id="githubLoginSubmit">GitHub ile devam et</button></form></details><p>Projelerin yalnızca hesabına görünür. Oturumun 30 gün açık kalır.</p></div></div>
+<div id="surveyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="surveyTitle"><div class="modal-content auth-card"><h2 id="surveyTitle">Seni biraz tanıyalım</h2><p>İlk projen öncesinde üç kısa soru.</p><form id="surveyForm" class="stack-form"><label>Kod bilgin<select id="surveyCoding" required><option value="">Seç…</option><option value="beginner">Yeni başlıyorum</option><option value="intermediate">Orta seviye</option><option value="advanced">İleri seviye</option></select></label><label>AI deneyimin<select id="surveyAi" required><option value="">Seç…</option><option value="new">İlk kez kullanıyorum</option><option value="sometimes">Ara sıra kullanıyorum</option><option value="often">Sık kullanıyorum</option></select></label><label>Armut Pen’i nereden duydun?<input id="surveySource" required maxlength="200" placeholder="Örn. sosyal medya, arkadaşım…"></label><div id="surveyError" class="form-error" role="alert"></div><button type="submit">Çalışma alanıma geç</button></form></div></div>
+<div id="aiSettingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><div class="modal-content"><h3 id="settingsTitle">⚙️ NOMI AI Ayarları</h3><p class="settings-note">Anahtarlarını kendin gir. Yalnızca bu açık sayfanın belleğinde tutulur; yenileyince veya çıkış yapınca silinir. İstekler sunucu üzerinden ilgili sağlayıcıya iletilir; anahtarlar veritabanına kaydedilmez. Sağlayıcı ücretleri günlük uygulama kredilerinden ayrıdır.</p><div class="provider-grid" id="providerGrid"></div><p class="settings-note">Modeli sohbet penceresinden seç. Model erişimi sağlayıcının hesabındaki yetkilere bağlıdır.</p><div class="settings-fields"><label>Düşünme seviyesi<select id="thinkingLevel"><option value="low">Düşük / hızlı</option><option value="medium" selected>Orta</option><option value="high">Yüksek / ayrıntılı</option></select></label><label>Sistem promptu<textarea id="systemPrompt" rows="3" maxlength="6000" placeholder="Örn. Türkçe yanıt ver, erişilebilir arayüzler üret."></textarea></label></div><h4 style="margin-top:18px">GitHub bağlantısı</h4><p class="settings-note">OAuth / Client ID gerekmez. Kendi PAT tokenını kullan: depo oluşturmak ve push için repository / Contents yazma izni, Pages için Pages yazma izni gerekir. Yeni depolar özel oluşturulur; Pages içeriği herkese açık olabilir.</p><div class="github-grid"><label>GitHub PAT<input id="githubPat" type="password" autocomplete="off" placeholder="Kişisel erişim tokenı"></label><label>GitHub kullanıcı / organizasyon<input id="githubOwner" maxlength="100" placeholder="kullanici-adin"></label><label>GitHub depo adı<input id="githubRepo" maxlength="100" placeholder="projem"></label></div><div id="settingsStatus" class="form-error" role="status"></div><div class="modal-footer"><button class="secondary" id="btnConnectGithub">Tokenı doğrula</button><button class="secondary" id="btnCloseAiSettings">Kapat</button><button class="success" id="btnSaveAiSettings">Ayarları uygula</button></div></div></div>
+<div id="findReplaceModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="findTitle"><div class="modal-content"><h3 id="findTitle">Ara ve Değiştir</h3><div class="modal-body"><input id="searchInput" aria-label="Aranan metin" placeholder="Aranan metin"><input id="replaceInput" aria-label="Yeni metin" placeholder="Yeni metin"><p id="findResult" role="status"></p></div><div class="modal-footer"><button id="btnFindAll">Tümünü Bul</button><button id="btnReplaceAll">Tümünü Değiştir</button><button class="secondary" id="btnCloseFindReplace">Kapat</button></div></div></div>
+<div id="versionsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="versionsTitle"><div class="modal-content"><h3 id="versionsTitle">Sürüm geçmişi</h3><p class="settings-note">Son 30 sürüm saklanır. AI, şablon ve geri yükleme öncesinde otomatik yedek alınır.</p><button id="btnCheckpoint">Şimdiki sürümü kaydet</button><div id="versionList"></div><div class="modal-footer"><button class="secondary" id="btnCloseVersions">Kapat</button></div></div></div>
+<dialog id="toolModal"><h3 id="toolTitle"></h3><form id="toolForm" class="stack-form"><label id="toolLabel"><span id="toolLabelText"></span><input id="toolInput" maxlength="240"><select id="toolSelect" hidden></select></label><p id="toolNote"></p><div id="toolError" class="form-error" role="alert"></div><div class="modal-footer"><button type="button" id="toolCancel" class="secondary">Vazgeç</button><button type="submit" id="toolSubmit">Uygula</button></div></form></dialog>
+<div id="toast" role="status" hidden></div>
+<script type="module" src="/workspace.js"></script></body></html>
