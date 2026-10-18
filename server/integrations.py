@@ -6,10 +6,10 @@ import httpx
 from fastapi import HTTPException
 
 MODELS = {
-    'gemini': {'label': 'Gemini 3.1 Pro', 'model': 'gemini-3.1-pro-preview', 'cost': 5},
-    'openai': {'label': 'ChatGPT 5.6 Luna', 'model': 'gpt-5.6-luna', 'cost': 2},
-    'anthropic': {'label': 'Claude Sonnet 5', 'model': 'claude-sonnet-5', 'cost': 5},
-    'deepseek': {'label': 'DeepSeek V4.1 Flash', 'model': 'deepseek-v4.1-flash', 'cost': 4},
+    'gemini': {'label': 'Gemini 3.1 Pro', 'model': 'gemini-3.1-pro-preview'},
+    'openai': {'label': 'ChatGPT 5.6 Luna', 'model': 'gpt-5.6-luna'},
+    'anthropic': {'label': 'Claude Sonnet 5', 'model': 'claude-sonnet-5'},
+    'deepseek': {'label': 'DeepSeek V4.1 Flash', 'model': 'deepseek-v4.1-flash'},
 }
 
 async def request_json(client, method, url, **kwargs):
@@ -56,7 +56,7 @@ async def generate(provider, key, prompt, thinking, system_prompt):
             raise ValueError()
         return result
     except (ValueError, TypeError):
-        raise HTTPException(502, 'Model geçerli proje yanıtı üretmedi. Krediniz iade edildi.')
+        raise HTTPException(502, 'Model geçerli proje yanıtı üretmedi.')
 
 
 async def github_identity(token):

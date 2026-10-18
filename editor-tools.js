@@ -1,10 +1,4 @@
-import { $, files, activeFile, setFiles, updateFile, changed, safePath, showLog } from './app.js';
-import * as prettier from 'prettier/standalone';
-import htmlPlugin from 'prettier/plugins/html';
-import babelPlugin from 'prettier/plugins/babel';
-import estreePlugin from 'prettier/plugins/estree';
-import cssPlugin from 'prettier/plugins/postcss';
-import { parse } from 'acorn';
+import { $, files, activeFile, setFiles, updateFile, changed, safePath, showLog, MAX_LINES, countLines } from './app.js';
 
 const templates = {
     landing: { label: 'Tanıtım sayfası', files: { 'index.html': '<!DOCTYPE html>\n<html lang="tr">\n<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yeni başlangıç</title></head>\n<body><main><small>HAYALDEN GERÇEĞE</small><h1>Bir sonraki fikrin burada.</h1><p>Birlikte harika şeyler üretelim.</p><button>Keşfet</button></main></body>\n</html>', 'src/style.css': 'body { margin: 0; background: #17231e; color: #ecf1e7; font-family: system-ui; padding: 12vh 10%; } h1 { font-size: clamp(2rem, 7vw, 4rem); max-width: 700px; } button { background: #a6e22e; border: 0; border-radius: 10px; padding: 14px 24px; }', 'src/script.js': 'document.querySelector("button").onclick = () => alert("Hoş geldin!");' } },
@@ -12,7 +6,21 @@ const templates = {
     portfolio: { label: 'Kişisel portfolyo', files: { 'index.html': '<!DOCTYPE html>\n<html lang="tr"><head><meta charset="utf-8"><title>Portfolyom</title></head><body><header><h1>Merhaba, ben bir geliştiriciyim.</h1><p>Tasarım ile kodun buluştuğu yerde.</p></header><main><h2>Projelerim</h2><article><h3>İlk projem</h3><p>Buraya projenin hikâyesini yaz.</p></article></main></body></html>', 'src/style.css': 'body { font-family: system-ui; background: #f6f3ec; color: #252e36; max-width: 900px; margin: auto; padding: 48px 24px; } header { padding-bottom: 40px; border-bottom: 1px solid #ccc; } article { background: white; padding: 24px; border-radius: 12px; }', 'src/script.js': '// Portfolyonun etkileşimlerini buraya ekle.' } }
 };
 const parserFor = path => ({ html: 'html', css: 'css', js: 'babel', json: 'json' })[path.split('.').pop()];
-const plugins = [htmlPlugin, babelPlugin, estreePlugin, cssPlugin];
+let prettierBundle;
+
+async function loadPrettier() {
+    if (!prettierBundle) {
+        const [prettier, htmlPlugin, babelPlugin, estreePlugin, cssPlugin] = await Promise.all([
+            import('prettier/standalone'),
+            import('prettier/plugins/html'),
+            import('prettier/plugins/babel'),
+            import('prettier/plugins/estree'),
+            import('prettier/plugins/postcss'),
+        ]);
+        prettierBundle = { prettier, plugins: [htmlPlugin.default, babelPlugin.default, estreePlugin.default, cssPlugin.default] };
+    }
+    return prettierBundle;
+}
 
 export function initTools({ ask, checkpoint, status }) {
     const add = folder => ask({ title: folder ? 'Klasör ve dosya oluştur' : 'Yeni dosya', label: 'Dosya yolu', value: folder ? 'yeni-klasor/index.html' : '', note: 'Klasörler dosya yolundan oluşturulur; örnek: src/app.js', submit: 'Oluştur', action: async path => {
@@ -35,14 +43,20 @@ export function initTools({ ask, checkpoint, status }) {
             const parser = parserFor(activeFile);
             if (!parser) throw Error('Biçimlendirme HTML, CSS, JavaScript ve JSON için kullanılabilir.');
             const path = activeFile, original = files[path];
+            const { prettier, plugins } = await loadPrettier();
             const formatted = await prettier.format(original, { parser, plugins, tabWidth: 2 });
+            if (countLines(formatted) > MAX_LINES) throw Error(`Biçimlendirme sonrası dosya 10.000 satır sınırını (${countLines(formatted)} satır) aşıyor.`);
             if (activeFile !== path || files[path] !== original) throw Error('Dosya değişti; tekrar biçimlendirin.');
             updateFile(path, formatted); showLog('✓ ' + path + ' biçimlendirildi.');
         } catch (error) { showLog(error.message, true); }
     };
     $('btnCheck').onclick = async () => {
         $('consolePanel').replaceChildren(); let errors = 0, checked = 0;
+        const [{ parse }, { prettier, plugins }] = await Promise.all([import('acorn'), loadPrettier()]);
         for (const [path, content] of Object.entries(files)) {
+            if (countLines(content) > MAX_LINES) {
+                errors++; showLog(`${path}: 10.000 satır sınırını aşıyor.`, true); continue;
+            }
             const parser = parserFor(path); if (!parser) continue; checked++;
             try {
                 if (path.endsWith('.js')) parse(content, { ecmaVersion: 'latest', sourceType: 'module', locations: true });

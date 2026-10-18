@@ -42,19 +42,15 @@ def limit(bucket, count=30):
 def current_user(request: Request):
     token = request.cookies.get('armut_session', '')
     with db() as c:
-        c.execute('BEGIN IMMEDIATE')
         row = c.execute('SELECT u.* FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires>?', (digest(token), int(time.time()))).fetchone()
         if not row:
             raise HTTPException(401, 'Oturum açmanız gerekiyor.')
-        if row['credit_day'] != day():
-            c.execute('UPDATE users SET credits=20,credit_day=? WHERE id=?', (day(), row['id']))
-            row = c.execute('SELECT * FROM users WHERE id=?', (row['id'],)).fetchone()
         return dict(row)
 
 
 def public_user(user):
     import json
-    return {k: user[k] for k in ('id', 'email', 'credits', 'credit_day')} | {'survey': json.loads(user['survey']) if user['survey'] else None}
+    return {'id': user['id'], 'email': user['email'], 'survey': json.loads(user['survey']) if user['survey'] else None}
 
 
 def session(response, user_id):

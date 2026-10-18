@@ -9,8 +9,8 @@
 ## Credentials and integrations
 - No app-owner secrets are needed to boot. User-supplied provider keys and GitHub PATs exist in frontend module memory only and are sent per request to fixed provider endpoints by the backend. Never persist them to localStorage, SQLite, logs or committed files. Reload/log out clears them. Old `nomi_ai_settings` storage is deleted on startup to remove former plaintext keys.
 - GitHub uses PATs, NOT OAuth. Account sign-in fetches a verified primary email; an existing email/password account must sign in first and explicitly link its GitHub identity in settings. There is no Google sign-in.
-- Real AI and GitHub tests require user-owned authorized credentials. Never invent a key, substitute a demo answer, or claim provider access was tested without credentials. Model identifiers are in `server/integrations.py`; provider rejection surfaces as an error and AI credits are refunded.
-- Credit day uses Europe/Istanbul. Requests reserve credits atomically before the upstream call. Jobs lock their project. Failed jobs refund credits; development startup refunds jobs interrupted by a reload. Run one API process with this recovery design (no multi-worker deployment until redesigned).
+- Real AI and GitHub tests require user-owned authorized credentials. Never invent a key, substitute a demo answer, or claim provider access was tested without credentials. Model identifiers are in `server/integrations.py`; provider rejection surfaces as an error. There is no daily credit system; users operate directly with their own API keys.
+- Active AI jobs lock their project via `ai_jobs`; development startup clears any jobs interrupted by a reload. Run one API process with this recovery design (no multi-worker deployment until redesigned).
 - GitHub repo creation defaults private. Push creates one non-force commit and retains remote files not present in the editor. Pages requires separate user confirmation and may expose site content publicly.
 
 ## Frontend boundaries
@@ -19,7 +19,7 @@
 - `editor-tools.js`: renaming, Prettier formatting, Acorn/JSON/Prettier syntax checks, templates.
 - Keep both preview iframes sandboxed WITHOUT allow-same-origin. User and AI code must not access application cookies, DOM, or key memory. Chat, file paths, and project names render as text, never raw HTML.
 - Non-secret per-user preferences/last project are localStorage; projects, messages, onboarding survey and last 30 versions are server-side. Autosave errors remain visible, and switching/logging out waits for a successful save.
-- Media imports become data URLs in private project JSON; max 500 KB per imported file, 2 MB/200 files per project. Archive extraction is not supported. Use ZIP export for a local backup before resolving a revision conflict.
+- Each file is strictly limited to 10,000 lines (`MAX_LINES = 10000` / `MAX_FILE_LINES = 10_000`). Media imports become data URLs in private project JSON; max 500 KB per imported media file, 2 MB per text file, 10 MB/200 files per project. Archive extraction is not supported. Use ZIP export for a local backup before resolving a revision conflict.
 
 ## Verification
 - `docker compose -f docker-compose.base44.yml ps` (both healthy).

@@ -98,14 +98,26 @@ async function loadProject(id) {
     localStorage.setItem('armut-project-' + user.id, result.id);
     status('✓ Özel projene kaydedildi');
 }
-async function updateUser() {
-    user = await api('/auth/me'); $('credits').textContent = user.credits + ' / 20 kredi'; $('accountEmail').textContent = user.email;
+async function updateUser(initialUser) {
+    user = initialUser || await api('/auth/me');
+    $('accountEmail').textContent = user.email;
 }
 async function enterWorkspace() {
     modal('surveyModal', false);
     const list = await projectList();
-    if (!list.length) { const result = await api('/projects', 'POST'); await projectList(); await loadProject(result.id); }
-    else { const id = localStorage.getItem('armut-project-' + user.id); await loadProject(list.some(p => p.id === id) ? id : list[0].id); }
+    if (!list.length) {
+        const created = await api('/projects', 'POST');
+        $('projectSelect').replaceChildren(new Option(created.name, created.id));
+        project = created; dirty = saved = 0;
+        setFiles(created.files, 'index.html');
+        renderMessages([]); setPending(created.pending_action);
+        $('projectSelect').value = created.id; $('consolePanel').replaceChildren(); $('userInput').value = '';
+        localStorage.setItem('armut-project-' + user.id, created.id);
+        status('✓ Özel projene kaydedildi');
+    } else {
+        const id = localStorage.getItem('armut-project-' + user.id);
+        await loadProject(list.some(p => p.id === id) ? id : list[0].id);
+    }
     const prefs = preferences();
     $('thinkingLevel').value = prefs.thinking || 'medium'; $('systemPrompt').value = prefs.systemPrompt || '';
     $('modelSelect').value = Object.hasOwn(modelCatalog, prefs.model) ? prefs.model : 'gemini';
@@ -113,9 +125,9 @@ async function enterWorkspace() {
     setMode(prefs.mode || 'half');
     document.body.classList.remove('locked');
 }
-async function afterLogin() {
+async function afterLogin(initialUser) {
     $('githubLoginToken').value = '';
-    await updateUser();
+    await updateUser(initialUser);
     if (!user.survey) { modal('authModal', false); modal('surveyModal', true); }
     else { await enterWorkspace(); modal('authModal', false); }
 }
@@ -215,7 +227,7 @@ async function sendMessage() {
         await api('/projects/' + project.id + '/ai', 'POST', { provider, key: keys[provider], prompt, thinking: $('thinkingLevel').value, system_prompt: $('systemPrompt').value, reference: referenceFile, revision: project.revision });
         await loadProject(project.id); await projectList();
     } catch (error) { if (loading) loading.textContent = '⚠ ' + error.message; else toast(error.message); }
-    finally { try { await updateUser(); } catch {} lock(false); }
+    finally { lock(false); }
 }
 $('btnSendAi').onclick = sendMessage;
 $('userInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
@@ -258,16 +270,17 @@ async function boot() {
     try {
         // Previous builds stored keys persistently. Do not carry them into shared accounts.
         localStorage.removeItem('nomi_ai_settings');
-        modelCatalog = await api('/models');
-        $('modelSelect').replaceChildren(...Object.entries(modelCatalog).map(([key, value]) => new Option(value.label + ' · ' + value.cost + ' kredi', key)));
+        const [catalog, session] = await Promise.all([api('/models'), api('/auth/session')]);
+        modelCatalog = catalog;
+        $('modelSelect').replaceChildren(...Object.entries(modelCatalog).map(([key, value]) => new Option(value.label, key)));
+        $('providerGrid').replaceChildren();
         Object.entries(modelCatalog).forEach(([key, value]) => {
             const card = document.createElement('div'); card.className = 'provider-card';
             const label = document.createElement('label'); label.textContent = value.label; label.htmlFor = 'key-' + key;
             const input = document.createElement('input'); input.id = 'key-' + key; input.type = 'password'; input.placeholder = 'API anahtarın'; input.autocomplete = 'off'; input.maxLength = 1024;
             card.append(label, input); $('providerGrid').append(card);
         });
-        const session = await api('/auth/session');
-        if (session.user) await afterLogin();
+        if (session.user) await afterLogin(session.user);
     } catch (error) { $('authError').textContent = error.message; }
 }
 boot();

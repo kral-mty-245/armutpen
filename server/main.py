@@ -15,10 +15,7 @@ from server.integrations import MODELS, generate, github_identity, github_action
 @asynccontextmanager
 async def lifespan(app):
     migrate()
-    # A development reload may interrupt a request: return its reserved credits.
     with db() as c:
-        for job in c.execute('SELECT * FROM ai_jobs').fetchall():
-            c.execute('UPDATE users SET credits=MIN(20,credits+?) WHERE id=? AND credit_day=?', (job['cost'], job['user_id'], job['credit_day']))
         c.execute('DELETE FROM ai_jobs')
     yield
 
@@ -39,8 +36,8 @@ async def protect(request: Request, call_next):
         if request.headers.get('x-armut-request') != '1' or request.headers.get('sec-fetch-site') == 'cross-site':
             return JSONResponse({'detail': 'İstek doğrulanamadı.'}, status_code=403)
         try:
-            if int(request.headers.get('content-length', '0')) > 3_000_000:
-                return JSONResponse({'detail': 'İstek çok büyük (en fazla 3 MB).'}, status_code=413)
+            if int(request.headers.get('content-length', '0')) > 12_000_000:
+                return JSONResponse({'detail': 'İstek çok büyük (en fazla 12 MB).'}, status_code=413)
         except ValueError:
             return JSONResponse({'detail': 'Geçersiz istek.'}, status_code=400)
     response = await call_next(request)
@@ -67,6 +64,9 @@ def survey(data: Survey, user=Depends(current_user)):
     return {'ok': True}
 
 
+MAX_FILE_LINES = 10_000
+
+
 def validate_files(files):
     if not isinstance(files, dict) or not 1 <= len(files) <= 200:
         raise ValueError('Projede 1–200 metin dosyası olmalı.')
@@ -75,8 +75,10 @@ def validate_files(files):
             or any(part in ('', '.', '..', '.git') for part in path.split('/')) or any(ord(char) < 32 for char in path)
             or not isinstance(content, str)):
             raise ValueError('Geçersiz dosya yolu veya içeriği.')
-    if len(json.dumps(files).encode()) > 2_000_000:
-        raise ValueError('Proje en fazla 2 MB olabilir.')
+        if content.count('\n') + 1 > MAX_FILE_LINES:
+            raise ValueError(f'Dosya başına en fazla {MAX_FILE_LINES} satır kod olabilir ({path}).')
+    if len(json.dumps(files).encode()) > 10_000_000:
+        raise ValueError('Proje en fazla 10 MB olabilir.')
     return files
 
 
@@ -191,16 +193,13 @@ class AiRequest(BaseModel):
 
 @app.post('/api/projects/{project_id}/ai')
 async def ai(project_id: str, data: AiRequest, user=Depends(current_user)):
-    cost = MODELS[data.provider]['cost']
     with db() as c:
         c.execute('BEGIN IMMEDIATE')
         row = owned(c, project_id, user)
         if row['revision'] != data.revision:
             raise HTTPException(409, 'Proje değişmiş. Yenileyip tekrar deneyin.')
         ensure_idle(c, project_id)
-        if not c.execute('UPDATE users SET credits=credits-? WHERE id=? AND credits>=?', (cost, user['id'], cost)).rowcount:
-            raise HTTPException(402, 'Günlük krediniz yetersiz. Krediler İstanbul saatine göre 00:00’da 20’ye yenilenir.')
-        c.execute('INSERT INTO ai_jobs VALUES (?,?,?,?,?)', (project_id, user['id'], cost, day(), int(time.time())))
+        c.execute('INSERT INTO ai_jobs VALUES (?,?,?,?,?)', (project_id, user['id'], 0, day(), int(time.time())))
         history = [dict(r) for r in c.execute('SELECT role,content FROM (SELECT * FROM messages WHERE project_id=? ORDER BY id DESC LIMIT 12) ORDER BY id', (project_id,))]
     try:
         prompt = json.dumps({'project': json.loads(row['files']), 'conversation': history, 'request': data.prompt, 'referenceFile': data.reference}, ensure_ascii=False)
@@ -222,13 +221,10 @@ async def ai(project_id: str, data: AiRequest, user=Depends(current_user)):
         return {'ok': True, 'action': action}
     except Exception as error:
         with db() as c:
-            job = c.execute('SELECT * FROM ai_jobs WHERE project_id=?', (project_id,)).fetchone()
-            if job:
-                c.execute('UPDATE users SET credits=MIN(20,credits+?) WHERE id=? AND credit_day=?', (cost, user['id'], job['credit_day']))
-                c.execute('DELETE FROM ai_jobs WHERE project_id=?', (project_id,))
+            c.execute('DELETE FROM ai_jobs WHERE project_id=?', (project_id,))
         if isinstance(error, HTTPException):
             raise error
-        raise HTTPException(502, 'AI yanıtı uygulanamadı. Projeniz korunuyor, kredi iade edildi.')
+        raise HTTPException(502, 'AI yanıtı uygulanamadı. Projeniz korunuyor.')
 
 
 class GithubToken(BaseModel):
