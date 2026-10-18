@@ -1,10 +1,21 @@
 {
-  "name": "Armut Pen",
-  "short_name": "Armut Pen",
-  "description": "NOMI AI destekli çevrim içi kod editörü.",
-  "start_url": "/armutpen/",
+  "name": "Armut Pen 9 (Turtle)",
+  "short_name": "Armut Pen 9",
+  "description": "Armut Pen 9 (Kod adı: Turtle) — NOMI AI destekli çevrim içi kod editörü.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e1e1e",
-  "theme_color": "#0e639c",
-  "lang": "tr"
+  "background_color": "#0c1420",
+  "theme_color": "#236b33",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

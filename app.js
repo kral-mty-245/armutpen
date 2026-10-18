@@ -421,7 +421,38 @@ export function initEditor(callback) {
     $('btnClearRef').onclick = clearReference;
     $('btnFullscreen').onclick = () => { $('fullscreen-modal').classList.add('active'); runPreview(); };
     $('btnCloseFs').onclick = () => { $('fullscreen-modal').classList.remove('active'); $('fs-preview-frame').srcdoc = ''; };
-    $('btnTheme').onclick = () => document.body.classList.toggle('light-theme');
+    const THEME_ORDER = ['liquid', 'light', 'classic'];
+    const THEME_LABELS = {
+        liquid: '💧 Liquid Glass',
+        light: '☀️ Açık Cam',
+        classic: '🍐 Klasik Armut'
+    };
+    const applyTheme = (theme) => {
+        if (!THEME_ORDER.includes(theme)) theme = 'liquid';
+        document.body.dataset.theme = theme;
+        document.body.classList.toggle('light-theme', theme === 'light');
+        if ($('btnTheme')) $('btnTheme').textContent = THEME_LABELS[theme];
+        if ($('themeSelect')) $('themeSelect').value = theme;
+        document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.themeChoice === theme);
+            btn.setAttribute('aria-pressed', String(btn.dataset.themeChoice === theme));
+        });
+        try { localStorage.setItem('armut-ui-theme', theme); } catch {}
+    };
+    let initialTheme = 'liquid';
+    try { initialTheme = localStorage.getItem('armut-ui-theme') || 'liquid'; } catch {}
+    applyTheme(initialTheme);
+    $('btnTheme').onclick = () => {
+        const current = document.body.dataset.theme || 'liquid';
+        const next = THEME_ORDER[(THEME_ORDER.indexOf(current) + 1) % THEME_ORDER.length];
+        applyTheme(next);
+    };
+    if ($('themeSelect')) {
+        $('themeSelect').onchange = e => applyTheme(e.target.value);
+    }
+    document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+        btn.onclick = () => applyTheme(btn.dataset.themeChoice);
+    });
     $('btnFindReplace').onclick = () => $('findReplaceModal').classList.add('active');
     $('btnCloseFindReplace').onclick = () => $('findReplaceModal').classList.remove('active');
     $('btnFindAll').onclick = () => { const q = $('searchInput').value; $('findResult').textContent = q ? `${files[activeFile].split(q).length - 1} eşleşme bulundu.` : 'Aranacak metni girin.'; };

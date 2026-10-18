@@ -1,18 +1,157 @@
 [hidden] { display: none !important; }
 body { min-width: 320px; }
 body.locked > header, body.locked > .project-bar, body.locked > .workspace { visibility: hidden; pointer-events: none; }
+
+/* ==========================================================================
+   SHARED LAYOUT & BRANDING (Armut Pen 9 · Turtle)
+   ========================================================================== */
 header { flex-wrap: wrap; padding-block: 8px; }
-.brand-modes, .mode-tabs, .project-bar, .editor-tools { display: flex; align-items: center; gap: 6px; }
+.brand-modes, .mode-tabs, .project-bar, .editor-tools { display: flex; align-items: center; gap: 8px; }
 .mode-tabs { flex-wrap: wrap; }
-.mode-tabs button { padding: 7px 9px; background: #343739; font-size: 10px; }
-.mode-tabs button[aria-pressed="true"] { background: #a6e22e; color: #172118; }
-.project-bar { padding: 8px 12px; border-bottom: 1px solid #3c3c3c; background: var(--bg-light); flex-wrap: wrap; }
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.brand-logo {
+    height: 30px;
+    width: auto;
+    border-radius: 8px;
+    padding: 2px 6px;
+    background: #f9f9f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    object-fit: contain;
+    display: block;
+}
+.brand-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    gap: 2px;
+}
+.brand-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.logo span.brand-badge {
+    font-size: 9.5px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 999px;
+    width: fit-content;
+}
+
+.auth-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+.auth-logo {
+    height: 46px;
+    width: auto;
+    border-radius: 12px;
+    padding: 4px 10px;
+    background: #f9f9f6;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    object-fit: contain;
+}
+.auth-version-info h1 {
+    margin-bottom: 4px !important;
+    font-size: 24px !important;
+}
+.codename-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(46, 160, 107, 0.18);
+    color: #6ee7b7;
+    border: 1px solid rgba(110, 231, 183, 0.28);
+}
+.auth-theme-bar, .theme-Quick-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 10px 0 16px;
+}
+body .theme-chip {
+    flex: 1;
+    min-width: 110px;
+    padding: 7px 12px;
+    font-size: 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+body[data-theme="light"] .theme-chip {
+    background: rgba(35, 107, 51, 0.06);
+    border-color: rgba(35, 107, 51, 0.18);
+}
+body .theme-chip.active {
+    background: linear-gradient(135deg, #236b33, #2ea06b);
+    color: #ffffff;
+    border-color: rgba(110, 231, 183, 0.5);
+    box-shadow: 0 4px 14px rgba(35, 107, 51, 0.35);
+}
+
+.settings-modal-header {
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.settings-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.settings-logo {
+    height: 38px;
+    width: auto;
+    border-radius: 10px;
+    padding: 3px 8px;
+    background: #f9f9f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+.theme-settings-card {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    margin-bottom: 14px;
+}
+.theme-settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.theme-settings-header select {
+    min-width: 230px;
+}
+
+/* ==========================================================================
+   BASE STRUCTURAL RULES (Preserved across all themes)
+   ========================================================================== */
+.project-bar { padding: 8px 14px; border-bottom: 1px solid #3c3c3c; background: var(--bg-light); flex-wrap: wrap; }
 #projectSelect { width: min(260px, 45vw); }
 #saveStatus { margin-left: auto; font-size: 11px; color: #b2c5a2; }
-#lineCountStatus { border: 1px solid #3c3c3c; border-radius: 12px; padding: 4px 9px; font-size: 11px; white-space: nowrap; color: #aaa; }
+#lineCountStatus { border: 1px solid #3c3c3c; border-radius: 999px; padding: 4px 10px; font-size: 11px; white-space: nowrap; color: #aaa; }
 #accountEmail { max-width: 180px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: #aaa; }
-.editor-tools { padding: 6px; background: var(--bg-light); flex-wrap: wrap; border-bottom: 1px solid #3c3c3c; }
-.editor-tools button { background: #353b40; font-size: 10px; }
+.editor-tools { padding: 6px 10px; background: var(--bg-light); flex-wrap: wrap; border-bottom: 1px solid #3c3c3c; }
+.editor-tools button { background: #353b40; font-size: 11px; }
 .file-name, .folder-toggle { background: transparent; text-align: left; overflow-wrap: anywhere; padding: 0; flex: 1; }
 .file-name { font-weight: normal; color: var(--text); }
 .folder-toggle { font-weight: 600; color: #e8a838; }
@@ -21,58 +160,449 @@ header { flex-wrap: wrap; padding-block: 8px; }
 .tree-item .del-btn, .tree-item .add-file-btn { background: transparent; color: #999; padding: 1px 5px; font-size: 12px; }
 .tree-item .add-file-btn:hover { color: #a6e22e; }
 .tree-item .del-btn:hover { color: #ff5555; }
-.folder-children { padding-left: 14px; border-left: 1px solid #333; margin-left: 10px; }
+.folder-children { padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, 0.1); margin-left: 10px; }
 .folder-empty { padding: 3px 12px; font-size: 11px; color: #777; font-style: italic; }
 .line-numbers { white-space: pre; }
-#sidebar { width: 185px; flex-shrink: 0; }
+#sidebar { width: 195px; flex-shrink: 0; }
 #highlightCode.hljs { padding: 0; background: transparent; }
 .panel-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
 #modelSelect { width: 100%; margin-top: 5px; }
-#preview-panel { flex: 0.85; }
+#preview-panel { flex: 0.9; }
 #ai-panel { width: 320px; flex-shrink: 0; }
 #ai-panel .message { white-space: pre-wrap; font-size: 12px; line-height: 1.65; }
-#userInput { width: 100%; resize: vertical; min-height: 55px; max-height: 180px; font: 12px/1.5 inherit; }
+#userInput { width: 100%; resize: vertical; min-height: 58px; max-height: 180px; font: 12px/1.5 inherit; }
 #btnSendAi { align-self: flex-end; padding: 8px 18px; background: #a6e22e; color: #162016; }
-#pendingAction { padding: 8px; border: 1px solid #65764e; border-radius: 5px; font-size: 11px; }
+#pendingAction { padding: 8px; border: 1px solid #65764e; border-radius: 8px; font-size: 11px; }
 body[data-mode="code"] #ai-panel { display: none; }
 body[data-mode="ai"] #sidebar, body[data-mode="ai"] #editor-panel { display: none; }
 body[data-mode="ai"] .workspace { justify-content: center; gap: 20px; padding: 24px; }
-body[data-mode="ai"] #ai-panel { order: 0; width: min(760px, 70%); border: 1px solid #3c3c3c; border-radius: 10px; overflow: hidden; }
-body[data-mode="ai"] #preview-panel { order: 1; flex: none; width: min(320px, 28%); height: 340px; border-radius: 10px; overflow: hidden; border: 1px solid #3c3c3c; }
+body[data-mode="ai"] #ai-panel { order: 0; width: min(760px, 70%); border: 1px solid #3c3c3c; border-radius: 14px; overflow: hidden; }
+body[data-mode="ai"] #preview-panel { order: 1; flex: none; width: min(320px, 28%); height: 340px; border-radius: 14px; overflow: hidden; border: 1px solid #3c3c3c; }
 body[data-mode="ai"] .chat-history { padding: 24px; }
 body[data-mode="ai"] .message { font-size: 14px; }
-.auth-card { max-width: 430px; border: 1px solid #485039; padding: 32px; }
+.auth-card { max-width: 450px; border: 1px solid #485039; padding: 32px; }
 .auth-card h1 { font-size: 26px; color: #bcde82; margin-bottom: 8px; }
-.auth-card h2 { font-size: 20px; margin-bottom: 10px; }
-.auth-card p { font-size: 12px; line-height: 1.7; color: #aaa; margin: 10px 0 20px; }
-.stack-form { display: flex; flex-direction: column; gap: 14px; }
-.stack-form label, .settings-fields label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; }
-.stack-form input, .stack-form select, .settings-fields input, .settings-fields select, .settings-fields textarea { width: 100%; font-size: 13px; padding: 10px; }
-.stack-form button { padding: 11px; font-size: 12px; }
+.auth-card h2 { font-size: 19px; margin-bottom: 10px; }
+.auth-card p { font-size: 12.5px; line-height: 1.65; color: #aaa; margin: 8px 0 16px; }
+.stack-form { display: flex; flex-direction: column; gap: 13px; }
+.stack-form label, .settings-fields label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.stack-form input, .stack-form select, .settings-fields input, .settings-fields select, .settings-fields textarea { width: 100%; font-size: 13px; padding: 10px 12px; }
+.stack-form button { padding: 11px; font-size: 12.5px; }
 .form-error { color: #ffb5ab; font-size: 12px; min-height: 16px; line-height: 1.6; }
 .settings-fields { display: grid; gap: 12px; }
 .settings-note { font-size: 12px; }
-.github-grid, .provider-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.github-grid, .provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .github-grid label { font-size: 12px; }
-.github-grid input { width: 100%; margin-top: 7px; }
-#toolModal { color: var(--text); border: 1px solid #555; border-radius: 8px; margin: auto; padding: 24px; background: var(--bg-light); width: min(500px,92vw); max-height: 85vh; }
-#toolModal::backdrop { background: #000b; }
+.github-grid input { width: 100%; margin-top: 6px; }
+#toolModal { color: var(--text); border: 1px solid #555; border-radius: 14px; margin: auto; padding: 24px; background: var(--bg-light); width: min(500px, 92vw); max-height: 85vh; }
+#toolModal::backdrop { background: rgba(4, 10, 20, 0.65); backdrop-filter: blur(6px); }
 #toolModal h3 { margin-bottom: 16px; }
 #toolNote { font-size: 12px; color: #aaa; line-height: 1.6; }
 #versionList { display: grid; gap: 8px; margin-top: 15px; }
-.version-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px; background: #333; font-size: 12px; }
-#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); max-width: min(650px,90vw); background: #27342b; color: #eef4e7; padding: 12px 20px; border: 1px solid #657b54; border-radius: 8px; z-index: 100001; font-size: 12px; }
+.version-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: #333; border-radius: 8px; font-size: 12px; }
+#toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); max-width: min(650px, 90vw); background: #27342b; color: #eef4e7; padding: 12px 20px; border: 1px solid #657b54; border-radius: 999px; z-index: 100001; font-size: 12px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }
 button:disabled { opacity: .5; cursor: wait; }
-button:focus-visible, input:focus-visible, textarea:not(#codeEditor):focus-visible, select:focus-visible { outline: 2px solid #a6e22e; outline-offset: 2px; }
-body.light-theme .panel-header, body.light-theme .tabs, body.light-theme .editor-tools, body.light-theme .message.ai { background: #e4e7e5; color: #243028; }
-body.light-theme #highlightCode { color: #24282b; }
-@media (max-width: 1100px) { .brand-modes { flex-wrap: wrap; } #sidebar { width: 145px; } #ai-panel { width: 270px; } .logo { margin-right: 10px; } }
+button:focus-visible, input:focus-visible, textarea:not(#codeEditor):focus-visible, select:focus-visible { outline: 2px solid #38b27b; outline-offset: 2px; }
+
+/* ==========================================================================
+   CLASSIC ARMUT THEME (data-theme="classic") — Eski Armut Teması
+   ========================================================================== */
+body[data-theme="classic"] .mode-tabs button { padding: 7px 9px; background: #343739; font-size: 10px; }
+body[data-theme="classic"] .mode-tabs button[aria-pressed="true"] { background: #a6e22e; color: #172118; }
+body[data-theme="classic"] .brand-title { color: #a6e22e; }
+body[data-theme="classic"] .logo span.brand-badge { background: #3c3c3c; color: #a6e22e; }
+
+/* ==========================================================================
+   LIQUID GLASS THEME (data-theme="liquid" & data-theme="light")
+   Sade, Kullanıcı Dostu, Göz Yormayan Cam Tasarım (Armut Pen 9 · Turtle)
+   ========================================================================== */
+body:not([data-theme="classic"]) {
+    --glass-bg: rgba(18, 28, 43, 0.66);
+    --glass-bg-elevated: rgba(25, 38, 58, 0.74);
+    --glass-header: rgba(15, 24, 38, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.11);
+    --glass-border-strong: rgba(255, 255, 255, 0.18);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 14px 36px rgba(3, 8, 18, 0.34);
+    --primary: #2b8a57;
+    --primary-glow: rgba(43, 138, 87, 0.32);
+    --accent-teal: #38bdf8;
+    --text: #e6edf5;
+    --text-muted: #94a3b8;
+    --editor-surface: rgba(11, 18, 29, 0.78);
+    --input-surface: rgba(12, 20, 33, 0.62);
+
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    background-color: #0b1320;
+    background-image:
+        radial-gradient(circle at 12% 14%, rgba(35, 107, 51, 0.22), transparent 42%),
+        radial-gradient(circle at 86% 18%, rgba(56, 189, 248, 0.15), transparent 44%),
+        radial-gradient(circle at 50% 88%, rgba(45, 138, 97, 0.16), transparent 48%),
+        linear-gradient(160deg, #0a111c 0%, #0f1b2b 52%, #0c1624 100%);
+    background-attachment: fixed;
+    color: var(--text);
+}
+
+/* Light Liquid Glass Variant (Göz Yormayan Ferah Cam) */
+body[data-theme="light"] {
+    --glass-bg: rgba(255, 255, 255, 0.68);
+    --glass-bg-elevated: rgba(255, 255, 255, 0.84);
+    --glass-header: rgba(248, 251, 254, 0.76);
+    --glass-border: rgba(35, 107, 51, 0.14);
+    --glass-border-strong: rgba(35, 107, 51, 0.24);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    --glass-shadow: 0 12px 32px rgba(24, 42, 64, 0.08);
+    --primary: #236b33;
+    --primary-glow: rgba(35, 107, 51, 0.22);
+    --accent-teal: #0284c7;
+    --text: #1e293b;
+    --text-muted: #52637a;
+    --editor-surface: rgba(252, 254, 255, 0.86);
+    --input-surface: rgba(241, 246, 251, 0.82);
+
+    background-color: #eaf1f7;
+    background-image:
+        radial-gradient(circle at 10% 12%, rgba(35, 107, 51, 0.12), transparent 42%),
+        radial-gradient(circle at 88% 16%, rgba(14, 165, 233, 0.12), transparent 44%),
+        radial-gradient(circle at 50% 90%, rgba(46, 160, 107, 0.10), transparent 48%),
+        linear-gradient(160deg, #edf3f8 0%, #e2ecf4 55%, #eaf1f6 100%);
+    color: var(--text);
+}
+
+body:not([data-theme="classic"]) header {
+    background: var(--glass-header);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--glass-highlight);
+    padding: 8px 16px;
+    min-height: 54px;
+}
+
+body:not([data-theme="classic"]) .brand-title {
+    color: var(--text);
+}
+
+body:not([data-theme="classic"]) .logo span.brand-badge {
+    background: rgba(43, 138, 87, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(110, 231, 183, 0.25);
+}
+body[data-theme="light"] .logo span.brand-badge,
+body[data-theme="light"] .codename-pill {
+    background: rgba(35, 107, 51, 0.12);
+    color: #1d5d2b;
+    border-color: rgba(35, 107, 51, 0.25);
+}
+
+/* Segmented Pill Mode Tabs */
+body:not([data-theme="classic"]) .mode-tabs {
+    background: var(--input-surface);
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    gap: 3px;
+}
+body:not([data-theme="classic"]) .mode-tabs button {
+    padding: 6px 13px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    border: none;
+    box-shadow: none;
+}
+body:not([data-theme="classic"]) .mode-tabs button:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
+    filter: none;
+}
+body:not([data-theme="classic"]) .mode-tabs button[aria-pressed="true"] {
+    background: linear-gradient(135deg, #236b33, #2ea06b);
+    color: #ffffff;
+    box-shadow: 0 3px 10px var(--primary-glow);
+}
+
+/* Buttons & Inputs in Liquid Glass */
+body:not([data-theme="classic"]) button {
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #236b33, #2b8a57);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: var(--glass-highlight);
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+body:not([data-theme="classic"]) button:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+body:not([data-theme="classic"]) button.secondary,
+body:not([data-theme="classic"]) .editor-tools button {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+}
+body[data-theme="light"] button.secondary,
+body[data-theme="light"] .editor-tools button {
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+}
+body:not([data-theme="classic"]) button.secondary:hover:not(:disabled),
+body:not([data-theme="classic"]) .editor-tools button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.13);
+    border-color: var(--glass-border-strong);
+}
+body[data-theme="light"] button.secondary:hover:not(:disabled),
+body[data-theme="light"] .editor-tools button:hover:not(:disabled) {
+    background: #ffffff;
+}
+body:not([data-theme="classic"]) button.success,
+body:not([data-theme="classic"]) #btnSendAi {
+    background: linear-gradient(135deg, #236b33, #2ea06b);
+    color: #ffffff;
+    border: 1px solid rgba(110, 231, 183, 0.35);
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+body:not([data-theme="classic"]) input,
+body:not([data-theme="classic"]) select,
+body:not([data-theme="classic"]) textarea:not(#codeEditor) {
+    background: var(--input-surface);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 6px 10px;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body:not([data-theme="classic"]) input::placeholder,
+body:not([data-theme="classic"]) textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* Project Bar in Liquid Glass */
+body:not([data-theme="classic"]) .project-bar {
+    background: rgba(15, 24, 38, 0.48);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 7px 16px;
+}
+body[data-theme="light"] .project-bar {
+    background: rgba(255, 255, 255, 0.55);
+}
+body:not([data-theme="classic"]) #saveStatus {
+    color: #6ee7b7;
+    font-weight: 500;
+}
+body[data-theme="light"] #saveStatus {
+    color: #236b33;
+}
+body:not([data-theme="classic"]) #lineCountStatus,
+body:not([data-theme="classic"]) #accountEmail {
+    color: var(--text-muted);
+    border-color: var(--glass-border);
+    background: rgba(255, 255, 255, 0.04);
+}
+body:not([data-theme="classic"]) #accountEmail {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+}
+
+/* Floating Liquid Glass Workspace Panels */
+body:not([data-theme="classic"]) .workspace {
+    padding: 10px 12px 12px;
+    gap: 10px;
+    background: transparent;
+}
+body:not([data-theme="classic"]) #sidebar,
+body:not([data-theme="classic"]) #editor-panel,
+body:not([data-theme="classic"]) #preview-panel,
+body:not([data-theme="classic"]) #ai-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    overflow: hidden;
+}
+
+body:not([data-theme="classic"]) .sidebar-header,
+body:not([data-theme="classic"]) .panel-header,
+body:not([data-theme="classic"]) .editor-tools {
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text);
+    padding: 9px 12px;
+}
+body[data-theme="light"] .sidebar-header,
+body[data-theme="light"] .panel-header,
+body[data-theme="light"] .editor-tools {
+    background: rgba(255, 255, 255, 0.55);
+}
+
+body:not([data-theme="classic"]) .search-box {
+    border-bottom: 1px solid var(--glass-border);
+    padding: 8px;
+}
+
+/* File Tree Items in Liquid Glass */
+body:not([data-theme="classic"]) .tree-item {
+    margin: 2px 6px;
+    padding: 6px 10px;
+    border-radius: 9px;
+    transition: background 0.15s ease;
+}
+body:not([data-theme="classic"]) .tree-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+body[data-theme="light"] .tree-item:hover {
+    background: rgba(35, 107, 51, 0.08);
+}
+body:not([data-theme="classic"]) .tree-item.active {
+    background: rgba(43, 138, 87, 0.22);
+    border-left: 3px solid #38b27b;
+}
+body[data-theme="light"] .tree-item.active {
+    background: rgba(35, 107, 51, 0.14);
+    border-left: 3px solid #236b33;
+}
+body:not([data-theme="classic"]) .tree-item .del-btn,
+body:not([data-theme="classic"]) .tree-item .add-file-btn {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--text-muted);
+}
+
+/* Editor & Tabs in Liquid Glass */
+body:not([data-theme="classic"]) .tabs {
+    background: rgba(0, 0, 0, 0.14);
+    padding: 4px 8px 0;
+    gap: 4px;
+    border-bottom: 1px solid var(--glass-border);
+}
+body[data-theme="light"] .tabs {
+    background: rgba(35, 107, 51, 0.05);
+}
+body:not([data-theme="classic"]) .tab {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 9px 9px 0 0;
+    color: var(--text-muted);
+    padding: 6px 12px;
+    box-shadow: none;
+}
+body:not([data-theme="classic"]) .tab.active {
+    background: var(--editor-surface);
+    color: var(--text);
+    border-color: var(--glass-border);
+    border-top: 2px solid #38b27b;
+}
+
+body:not([data-theme="classic"]) .editor-wrapper,
+body:not([data-theme="classic"]) textarea#codeEditor {
+    background: var(--editor-surface);
+    color: var(--text);
+}
+body:not([data-theme="classic"]) .line-numbers {
+    background: var(--editor-surface);
+    color: var(--text-muted);
+    border-right: 1px solid var(--glass-border);
+}
+body:not([data-theme="classic"]) .console-panel {
+    background: rgba(8, 13, 22, 0.65);
+    border-top: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    height: 105px;
+}
+body[data-theme="light"] .console-panel {
+    background: rgba(241, 245, 249, 0.88);
+}
+
+/* Chat & AI Panel in Liquid Glass */
+body:not([data-theme="classic"]) .chat-input-area {
+    background: rgba(10, 17, 28, 0.45);
+    border-top: 1px solid var(--glass-border);
+    padding: 10px;
+}
+body[data-theme="light"] .chat-input-area {
+    background: rgba(255, 255, 255, 0.65);
+}
+body:not([data-theme="classic"]) .message.ai {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    border-radius: 12px;
+}
+body[data-theme="light"] .message.ai {
+    background: rgba(255, 255, 255, 0.85);
+}
+body:not([data-theme="classic"]) .message.user {
+    background: linear-gradient(135deg, #236b33, #2b8a57);
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* Modals in Liquid Glass */
+body:not([data-theme="classic"]) .modal {
+    background: rgba(6, 12, 22, 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+body:not([data-theme="classic"]) .modal-content,
+body:not([data-theme="classic"]) #toolModal {
+    background: var(--glass-bg-elevated);
+    backdrop-filter: blur(28px) saturate(170%);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: 20px;
+    box-shadow: 0 24px 60px rgba(2, 8, 20, 0.5), var(--glass-highlight);
+    color: var(--text);
+}
+body:not([data-theme="classic"]) .auth-card h1 {
+    color: var(--text);
+}
+body:not([data-theme="classic"]) .auth-card p,
+body:not([data-theme="classic"]) .settings-note,
+body:not([data-theme="classic"]) #toolNote {
+    color: var(--text-muted);
+}
+body:not([data-theme="classic"]) .provider-card,
+body:not([data-theme="classic"]) .version-row {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+}
+body[data-theme="light"] .provider-card,
+body[data-theme="light"] .version-row,
+body[data-theme="light"] .theme-settings-card {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: var(--glass-border);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1100px) {
+    .brand-modes { flex-wrap: wrap; }
+    #sidebar { width: 160px; }
+    #ai-panel { width: 275px; }
+    .logo { margin-right: 6px; }
+}
 @media (max-width: 760px) {
     body { height: auto; min-height: 100dvh; }
     header { align-items: flex-start; }
     .actions { justify-content: flex-start; }
     .workspace { flex-wrap: wrap; min-height: 80vh; }
-    #sidebar { width: 100%; max-height: 160px; }
+    #sidebar { width: 100%; max-height: 180px; }
     #editor-panel { flex: 1 1 100%; height: 450px; }
     #preview-panel { flex: 1 1 100%; height: 300px; }
     #ai-panel { width: 100%; height: 500px; }

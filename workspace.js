@@ -21,7 +21,8 @@ function preferences() {
     try { return JSON.parse(localStorage.getItem('armut-preferences-' + user.id) || '{}'); } catch { return {}; }
 }
 function savePreferences() {
-    localStorage.setItem('armut-preferences-' + user.id, JSON.stringify({ thinking: $('thinkingLevel').value, systemPrompt: $('systemPrompt').value, model: $('modelSelect').value, mode: document.body.dataset.mode, githubOwner, githubRepo }));
+    if (!user) return;
+    localStorage.setItem('armut-preferences-' + user.id, JSON.stringify({ thinking: $('thinkingLevel').value, systemPrompt: $('systemPrompt').value, model: $('modelSelect').value, mode: document.body.dataset.mode, theme: document.body.dataset.theme || 'liquid', githubOwner, githubRepo }));
 }
 function setMode(mode) {
     if (!['ai', 'half', 'code'].includes(mode)) mode = 'half';
@@ -124,6 +125,10 @@ async function enterWorkspace() {
     $('thinkingLevel').value = prefs.thinking || 'medium'; $('systemPrompt').value = prefs.systemPrompt || '';
     $('modelSelect').value = Object.hasOwn(modelCatalog, prefs.model) ? prefs.model : 'gemini';
     githubOwner = prefs.githubOwner || ''; githubRepo = prefs.githubRepo || '';
+    if (prefs.theme && $('themeSelect')) {
+        $('themeSelect').value = prefs.theme;
+        $('themeSelect').dispatchEvent(new Event('change'));
+    }
     setMode(prefs.mode || 'half');
     document.body.classList.remove('locked');
 }
