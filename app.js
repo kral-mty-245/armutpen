@@ -1,9 +1,12 @@
 export const $ = (id) => document.getElementById(id);
 export const MAX_LINES = 10000;
 export let files = {};
+export let folders = new Set();
+export let collapsedFolders = new Set();
 export let activeFile = '';
 export let referenceFile = null;
 let onChange = () => {};
+let onNewFileInFolder = null;
 let previewTimer;
 let renderedLines = 0;
 let lineCache = '';
@@ -44,6 +47,61 @@ export function safePath(path) {
     return typeof path === 'string' && path.length > 0 && path.length <= 240 && !/[\\\x00-\x1f]/.test(path) && path.split('/').every(p => p && !['.', '..', '.git'].includes(p));
 }
 
+export function normalizeFolderPath(raw) {
+    return String(raw || '').trim().replace(/^\/+|\/+$/g, '').replace(/\/+/g, '/');
+}
+
+function registerParentFolders(path, expand = false) {
+    const parts = path.split('/');
+    for (let i = 1; i < parts.length; i++) {
+        const prefix = parts.slice(0, i).join('/');
+        folders.add(prefix);
+        if (expand) collapsedFolders.delete(prefix);
+    }
+}
+
+let currentProjectKey = '';
+function saveStoredFolders() {
+    if (!currentProjectKey) return;
+    try { localStorage.setItem('armut-folders-' + currentProjectKey, JSON.stringify(Array.from(folders))); } catch {}
+}
+function loadStoredFolders() {
+    if (!currentProjectKey) return;
+    try {
+        const saved = JSON.parse(localStorage.getItem('armut-folders-' + currentProjectKey) || '[]');
+        saved.filter(safePath).forEach(f => folders.add(f));
+    } catch {}
+}
+export function setProjectFolderScope(projectId) {
+    currentProjectKey = projectId || '';
+    collapsedFolders = new Set();
+}
+
+export function addFolder(rawPath) {
+    const folderPath = normalizeFolderPath(rawPath);
+    if (!safePath(folderPath)) throw Error('Geçerli bir klasör adı veya yolu girin.');
+    if (Object.hasOwn(files, folderPath)) throw Error('Bu adda bir dosya zaten var.');
+    const parts = folderPath.split('/');
+    for (let i = 1; i <= parts.length; i++) {
+        const prefix = parts.slice(0, i).join('/');
+        folders.add(prefix);
+        collapsedFolders.delete(prefix);
+    }
+    saveStoredFolders();
+    renderTree();
+    showLog(`✓ "${folderPath}" klasörü oluşturuldu.`);
+}
+
+export function toggleFolder(folderPath) {
+    if (collapsedFolders.has(folderPath)) collapsedFolders.delete(folderPath);
+    else collapsedFolders.add(folderPath);
+    renderTree();
+}
+
+export function setFolderFileHandler(handler) {
+    onNewFileInFolder = handler;
+}
+
 function updateLineNumbers(lines, force = false) {
     const statusEl = $('lineCountStatus');
     if (statusEl) statusEl.textContent = `${lines.toLocaleString('tr-TR')} / 10.000 satır`;
@@ -54,11 +112,17 @@ function updateLineNumbers(lines, force = false) {
     $('lineNumbers').scrollTop = $('codeEditor').scrollTop;
 }
 
-export function setFiles(value, preferred = activeFile) {
+export function setFiles(value, preferred = activeFile, resetFolders = false) {
     const normalized = Object.create(null);
+    if (resetFolders) {
+        folders = new Set();
+        loadStoredFolders();
+    }
     for (const [k, v] of Object.entries(value || {})) {
         normalized[k] = (typeof v === 'string' && !(v.startsWith('data:') && media.test(k))) ? clampLines(v).text : v;
+        registerParentFolders(k);
     }
+    saveStoredFolders();
     files = normalized;
     activeFile = Object.hasOwn(files, preferred) ? preferred : Object.keys(files)[0];
     if (!Object.hasOwn(files, referenceFile)) clearReference();
@@ -71,6 +135,7 @@ export function updateFile(path, content) {
     const clamped = isMediaData ? { text: content, truncated: false } : clampLines(content);
     if (clamped.truncated) showLog(`⚠ ${path}: Dosya başına sınır 10.000 satırdır; fazlası kırpıldı.`, true);
     files[path] = clamped.text;
+    registerParentFolders(path, true);
     activeFile = path;
     changed();
     refresh();
@@ -86,6 +151,7 @@ export function showLog(message, error = false) {
 export function openFile(path) {
     if (!Object.hasOwn(files, path)) return;
     activeFile = path;
+    registerParentFolders(path, true);
     const isMediaData = files[path].startsWith('data:') && media.test(path);
     const clamped = isMediaData ? { text: files[path], lines: 1 } : clampLines(files[path]);
     files[path] = clamped.text;
@@ -108,24 +174,162 @@ function renderTabs() {
         $('tabsHeader').append(button);
     });
 }
-function renderTree() {
-    $('fileTree').replaceChildren();
-    const search = $('searchFiles').value.toLowerCase();
-    Object.keys(files).sort().filter(path => path.toLowerCase().includes(search)).forEach(path => {
-        const row = document.createElement('div'); row.className = 'tree-item ' + (path === activeFile ? 'active' : '');
-        const name = document.createElement('button'); name.className = 'file-name'; name.textContent = '📄 ' + path;
-        name.onclick = () => openFile(path);
-        const remove = document.createElement('button'); remove.textContent = '×'; remove.title = 'Dosyayı sil';
-        remove.onclick = () => {
-            if (Object.keys(files).length === 1) return showLog('Son dosyayı silemezsiniz.', true);
-            if (!confirm(`${path} silinsin mi?`)) return;
-            delete files[path];
-            if (referenceFile === path) clearReference();
-            if (activeFile === path) activeFile = Object.keys(files)[0];
-            changed(); refresh();
-        };
-        row.append(name, remove); $('fileTree').append(row);
+function removeFolder(folderPath) {
+    const prefix = folderPath + '/';
+    const insideFiles = Object.keys(files).filter(p => p.startsWith(prefix));
+    if (insideFiles.length && insideFiles.length >= Object.keys(files).length) {
+        return showLog('Projedeki tüm dosyaları silemezsiniz; en az 1 dosya kalmalı.', true);
+    }
+    const msg = insideFiles.length
+        ? `"${folderPath}" klasörü ve içindeki ${insideFiles.length} dosya silinsin mi?`
+        : `"${folderPath}" klasörü silinsin mi?`;
+    if (!confirm(msg)) return;
+    insideFiles.forEach(p => {
+        delete files[p];
+        if (referenceFile === p) clearReference();
     });
+    for (const f of Array.from(folders)) {
+        if (f === folderPath || f.startsWith(prefix)) {
+            folders.delete(f);
+            collapsedFolders.delete(f);
+        }
+    }
+    saveStoredFolders();
+    if (!Object.hasOwn(files, activeFile)) activeFile = Object.keys(files)[0];
+    if (insideFiles.length) { changed(); refresh(); }
+    else renderTree();
+}
+function renderTree() {
+    const treeEl = $('fileTree');
+    treeEl.replaceChildren();
+    const search = $('searchFiles').value.trim().toLowerCase();
+
+    const allFolders = new Set();
+    for (const f of folders) {
+        if (!search || f.toLowerCase().includes(search)) {
+            const parts = f.split('/');
+            for (let i = 1; i <= parts.length; i++) allFolders.add(parts.slice(0, i).join('/'));
+        }
+    }
+    const matchingFiles = Object.keys(files).sort().filter(path => !search || path.toLowerCase().includes(search));
+    for (const path of matchingFiles) {
+        const parts = path.split('/');
+        for (let i = 1; i < parts.length; i++) allFolders.add(parts.slice(0, i).join('/'));
+    }
+
+    const root = { folders: new Map(), files: [] };
+    const ensureFolderNode = (folderPath) => {
+        const parts = folderPath.split('/');
+        let curr = root;
+        let currentPath = '';
+        for (const part of parts) {
+            currentPath = currentPath ? `${currentPath}/${part}` : part;
+            if (!curr.folders.has(part)) {
+                curr.folders.set(part, { name: part, path: currentPath, folders: new Map(), files: [] });
+            }
+            curr = curr.folders.get(part);
+        }
+        return curr;
+    };
+
+    Array.from(allFolders).sort().forEach(ensureFolderNode);
+    for (const path of matchingFiles) {
+        const parts = path.split('/');
+        const fileName = parts.pop();
+        const parent = parts.length ? ensureFolderNode(parts.join('/')) : root;
+        parent.files.push({ name: fileName, path });
+    }
+
+    const renderNode = (node, container) => {
+        const sortedFolders = Array.from(node.folders.values()).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+        for (const folder of sortedFolders) {
+            const isCollapsed = !search && collapsedFolders.has(folder.path);
+            const row = document.createElement('div');
+            row.className = 'tree-item folder ' + (isCollapsed ? 'collapsed' : 'expanded');
+            row.dataset.folder = folder.path;
+
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'folder-toggle';
+            toggle.setAttribute('aria-expanded', String(!isCollapsed));
+            toggle.textContent = `${isCollapsed ? '▸ 📁' : '▾ 📂'} ${folder.name}`;
+            toggle.title = `${folder.path} (aç/kapat için tıkla)`;
+            toggle.onclick = () => toggleFolder(folder.path);
+
+            const actions = document.createElement('div');
+            actions.className = 'tree-item-actions';
+
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'add-file-btn';
+            addBtn.textContent = '+';
+            addBtn.title = `${folder.path} içine dosya ekle`;
+            addBtn.onclick = e => {
+                e.stopPropagation();
+                if (onNewFileInFolder) onNewFileInFolder(folder.path);
+            };
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'del-btn';
+            delBtn.textContent = '×';
+            delBtn.title = `${folder.path} klasörünü sil`;
+            delBtn.onclick = e => {
+                e.stopPropagation();
+                removeFolder(folder.path);
+            };
+
+            actions.append(addBtn, delBtn);
+            row.append(toggle, actions);
+            row.onclick = e => { if (e.target === row) toggleFolder(folder.path); };
+            container.append(row);
+
+            const children = document.createElement('div');
+            children.className = 'folder-children';
+            children.hidden = isCollapsed;
+            renderNode(folder, children);
+            if (!children.childElementCount) {
+                const empty = document.createElement('div');
+                empty.className = 'folder-empty';
+                empty.textContent = 'Boş klasör';
+                children.append(empty);
+            }
+            container.append(children);
+        }
+
+        const sortedFiles = node.files.slice().sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+        for (const file of sortedFiles) {
+            const row = document.createElement('div');
+            row.className = 'tree-item file ' + (file.path === activeFile ? 'active' : '');
+            row.dataset.file = file.path;
+
+            const name = document.createElement('button');
+            name.type = 'button';
+            name.className = 'file-name';
+            name.textContent = '📄 ' + file.name;
+            name.title = file.path;
+            name.onclick = () => openFile(file.path);
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'del-btn';
+            remove.textContent = '×';
+            remove.title = 'Dosyayı sil';
+            remove.onclick = e => {
+                e.stopPropagation();
+                if (Object.keys(files).length === 1) return showLog('Son dosyayı silemezsiniz.', true);
+                if (!confirm(`${file.path} silinsin mi?`)) return;
+                delete files[file.path];
+                if (referenceFile === file.path) clearReference();
+                if (activeFile === file.path) activeFile = Object.keys(files)[0];
+                changed(); refresh();
+            };
+            row.append(name, remove);
+            container.append(row);
+        }
+    };
+
+    renderNode(root, treeEl);
 }
 function renderReferences() {
     $('refSelect').replaceChildren(new Option('📎 Dosya Bağla...', ''));

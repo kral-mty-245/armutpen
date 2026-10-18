@@ -1,4 +1,4 @@
-import { $, files, activeFile, referenceFile, initEditor, setFiles, changed, showLog } from './app.js';
+import { $, files, activeFile, referenceFile, initEditor, setFiles, setProjectFolderScope, changed, showLog } from './app.js';
 import { initTools } from './editor-tools.js';
 
 let user = null, project = null, modelCatalog = {}, keys = {}, githubToken = '';
@@ -92,7 +92,8 @@ function setPending(action) {
 async function loadProject(id) {
     const result = await api('/projects/' + id);
     project = result; dirty = saved = 0;
-    setFiles(result.files, 'index.html');
+    setProjectFolderScope(result.id);
+    setFiles(result.files, 'index.html', true);
     renderMessages(result.messages || []); setPending(result.pending_action);
     $('projectSelect').value = result.id; $('consolePanel').replaceChildren(); $('userInput').value = '';
     localStorage.setItem('armut-project-' + user.id, result.id);
@@ -109,7 +110,8 @@ async function enterWorkspace() {
         const created = await api('/projects', 'POST');
         $('projectSelect').replaceChildren(new Option(created.name, created.id));
         project = created; dirty = saved = 0;
-        setFiles(created.files, 'index.html');
+        setProjectFolderScope(created.id);
+        setFiles(created.files, 'index.html', true);
         renderMessages([]); setPending(created.pending_action);
         $('projectSelect').value = created.id; $('consolePanel').replaceChildren(); $('userInput').value = '';
         localStorage.setItem('armut-project-' + user.id, created.id);
@@ -190,8 +192,16 @@ document.querySelectorAll('.mode-tabs button').forEach(button => button.onclick 
 $('btnAiFullscreen').onclick = () => setMode(document.body.dataset.mode === 'ai' ? 'half' : 'ai');
 $('btnEditProject').onclick = () => setMode('half');
 $('modelSelect').onchange = savePreferences;
+function providerList() {
+    const seen = new Map();
+    for (const [key, value] of Object.entries(modelCatalog)) {
+        const provider = value.provider || key;
+        if (!seen.has(provider)) seen.set(provider, value.provider_label || value.label);
+    }
+    return Array.from(seen.entries());
+}
 function openSettings() {
-    Object.keys(modelCatalog).forEach(provider => $('key-' + provider).value = keys[provider] || '');
+    providerList().forEach(([provider]) => { const el = $('key-' + provider); if (el) el.value = keys[provider] || ''; });
     $('githubPat').value = githubToken; $('githubOwner').value = githubOwner; $('githubRepo').value = githubRepo;
     $('settingsStatus').textContent = ''; modal('aiSettingsModal', true);
 }
@@ -201,7 +211,7 @@ $('btnCloseAiSettings').onclick = () => {
     modal('aiSettingsModal', false);
 };
 $('btnSaveAiSettings').onclick = () => {
-    Object.keys(modelCatalog).forEach(provider => keys[provider] = $('key-' + provider).value.trim());
+    providerList().forEach(([provider]) => { const el = $('key-' + provider); if (el) keys[provider] = el.value.trim(); });
     githubToken = $('githubPat').value.trim(); githubOwner = $('githubOwner').value.trim(); githubRepo = $('githubRepo').value.trim();
     savePreferences(); modal('aiSettingsModal', false);
     document.querySelectorAll('#aiSettingsModal input[type=password]').forEach(input => input.value = '');
@@ -218,13 +228,21 @@ $('btnConnectGithub').onclick = async () => {
 async function sendMessage() {
     if (busy) return;
     const prompt = $('userInput').value.trim(); if (!prompt) return;
-    const provider = $('modelSelect').value;
-    if (!keys[provider]) { openSettings(); $('settingsStatus').textContent = modelCatalog[provider].label + ' için API anahtarını gir.'; return; }
+    const modelKey = $('modelSelect').value;
+    const modelInfo = modelCatalog[modelKey] || {};
+    const providerKey = modelInfo.provider || modelKey;
+    const apiKey = keys[providerKey] || keys[modelKey];
+    if (!apiKey) {
+        openSettings();
+        $('settingsStatus').textContent = (modelInfo.provider_label || modelInfo.label || modelKey) + ' için API anahtarını gir.';
+        $('key-' + providerKey)?.focus();
+        return;
+    }
     lock(true); let loading;
     try {
         await flush();
         addMessage(prompt, 'user'); loading = addMessage('NOMI AI düşünüyor…', 'ai');
-        await api('/projects/' + project.id + '/ai', 'POST', { provider, key: keys[provider], prompt, thinking: $('thinkingLevel').value, system_prompt: $('systemPrompt').value, reference: referenceFile, revision: project.revision });
+        await api('/projects/' + project.id + '/ai', 'POST', { provider: modelKey, key: apiKey, prompt, thinking: $('thinkingLevel').value, system_prompt: $('systemPrompt').value, reference: referenceFile, revision: project.revision });
         await loadProject(project.id); await projectList();
     } catch (error) { if (loading) loading.textContent = '⚠ ' + error.message; else toast(error.message); }
     finally { lock(false); }
@@ -272,12 +290,20 @@ async function boot() {
         localStorage.removeItem('nomi_ai_settings');
         const [catalog, session] = await Promise.all([api('/models'), api('/auth/session')]);
         modelCatalog = catalog;
-        $('modelSelect').replaceChildren(...Object.entries(modelCatalog).map(([key, value]) => new Option(value.label, key)));
+        const groups = new Map();
+        for (const [key, value] of Object.entries(modelCatalog)) {
+            const groupLabel = value.provider_label || 'Modeller';
+            if (!groups.has(groupLabel)) groups.set(groupLabel, document.createElement('optgroup'));
+            const group = groups.get(groupLabel);
+            group.label = groupLabel;
+            group.append(new Option(value.label, key));
+        }
+        $('modelSelect').replaceChildren(...groups.values());
         $('providerGrid').replaceChildren();
-        Object.entries(modelCatalog).forEach(([key, value]) => {
+        providerList().forEach(([provider, providerLabel]) => {
             const card = document.createElement('div'); card.className = 'provider-card';
-            const label = document.createElement('label'); label.textContent = value.label; label.htmlFor = 'key-' + key;
-            const input = document.createElement('input'); input.id = 'key-' + key; input.type = 'password'; input.placeholder = 'API anahtarın'; input.autocomplete = 'off'; input.maxLength = 1024;
+            const label = document.createElement('label'); label.textContent = providerLabel; label.htmlFor = 'key-' + provider;
+            const input = document.createElement('input'); input.id = 'key-' + provider; input.type = 'password'; input.placeholder = 'API anahtarın'; input.autocomplete = 'off'; input.maxLength = 1024;
             card.append(label, input); $('providerGrid').append(card);
         });
         if (session.user) await afterLogin(session.user);

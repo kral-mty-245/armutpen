@@ -13,9 +13,16 @@ header { flex-wrap: wrap; padding-block: 8px; }
 #accountEmail { max-width: 180px; overflow: hidden; text-overflow: ellipsis; font-size: 11px; color: #aaa; }
 .editor-tools { padding: 6px; background: var(--bg-light); flex-wrap: wrap; border-bottom: 1px solid #3c3c3c; }
 .editor-tools button { background: #353b40; font-size: 10px; }
-.file-name { background: transparent; text-align: left; font-weight: normal; overflow-wrap: anywhere; padding: 0; color: var(--text); }
-.tree-item { gap: 6px; align-items: center; }
-.tree-item > button:last-child { background: transparent; color: #999; }
+.file-name, .folder-toggle { background: transparent; text-align: left; overflow-wrap: anywhere; padding: 0; flex: 1; }
+.file-name { font-weight: normal; color: var(--text); }
+.folder-toggle { font-weight: 600; color: #e8a838; }
+.tree-item { gap: 6px; align-items: center; user-select: none; }
+.tree-item-actions { display: flex; gap: 2px; align-items: center; }
+.tree-item .del-btn, .tree-item .add-file-btn { background: transparent; color: #999; padding: 1px 5px; font-size: 12px; }
+.tree-item .add-file-btn:hover { color: #a6e22e; }
+.tree-item .del-btn:hover { color: #ff5555; }
+.folder-children { padding-left: 14px; border-left: 1px solid #333; margin-left: 10px; }
+.folder-empty { padding: 3px 12px; font-size: 11px; color: #777; font-style: italic; }
 .line-numbers { white-space: pre; }
 #sidebar { width: 185px; flex-shrink: 0; }
 #highlightCode.hljs { padding: 0; background: transparent; }

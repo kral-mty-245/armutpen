@@ -1,4 +1,4 @@
-import { $, files, activeFile, setFiles, updateFile, changed, safePath, showLog, MAX_LINES, countLines } from './app.js';
+import { $, files, activeFile, setFiles, updateFile, changed, safePath, showLog, MAX_LINES, countLines, addFolder, setFolderFileHandler } from './app.js';
 
 const templates = {
     landing: { label: 'Tanıtım sayfası', files: { 'index.html': '<!DOCTYPE html>\n<html lang="tr">\n<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yeni başlangıç</title></head>\n<body><main><small>HAYALDEN GERÇEĞE</small><h1>Bir sonraki fikrin burada.</h1><p>Birlikte harika şeyler üretelim.</p><button>Keşfet</button></main></body>\n</html>', 'src/style.css': 'body { margin: 0; background: #17231e; color: #ecf1e7; font-family: system-ui; padding: 12vh 10%; } h1 { font-size: clamp(2rem, 7vw, 4rem); max-width: 700px; } button { background: #a6e22e; border: 0; border-radius: 10px; padding: 14px 24px; }', 'src/script.js': 'document.querySelector("button").onclick = () => alert("Hoş geldin!");' } },
@@ -23,14 +23,33 @@ async function loadPrettier() {
 }
 
 export function initTools({ ask, checkpoint, status }) {
-    const add = folder => ask({ title: folder ? 'Klasör ve dosya oluştur' : 'Yeni dosya', label: 'Dosya yolu', value: folder ? 'yeni-klasor/index.html' : '', note: 'Klasörler dosya yolundan oluşturulur; örnek: src/app.js', submit: 'Oluştur', action: async path => {
-        if (!safePath(path)) throw Error('Geçerli bir dosya yolu girin.');
-        if (Object.hasOwn(files, path)) throw Error('Bu dosya zaten var.');
-        if (Object.keys(files).length >= 200) throw Error('Dosya sınırı 200.');
-        updateFile(path, '');
-    } });
-    $('btnAddFile').onclick = () => add(false);
-    $('btnAddFolder').onclick = () => add(true);
+    const promptNewFile = (folderPrefix = '') => ask({
+        title: folderPrefix ? `"${folderPrefix}" içine dosya ekle` : 'Yeni dosya',
+        label: 'Dosya yolu',
+        value: folderPrefix ? `${folderPrefix}/` : '',
+        note: 'Örnek: index.js veya src/components/kart.js',
+        submit: 'Oluştur',
+        action: async rawPath => {
+            const path = rawPath.trim().replace(/^\/+|\/+$/g, '');
+            if (!safePath(path)) throw Error('Geçerli bir dosya yolu girin.');
+            if (Object.hasOwn(files, path)) throw Error('Bu dosya zaten var.');
+            if (Object.keys(files).length >= 200) throw Error('Dosya sınırı 200.');
+            updateFile(path, '');
+        }
+    });
+    const promptNewFolder = () => ask({
+        title: 'Yeni klasör oluştur',
+        label: 'Klasör adı veya yolu',
+        value: '',
+        note: 'Klasöre tıklayarak açıp kapatabilir, + düğmesiyle içine dosya ekleyebilirsin. Örnek: components veya src/ui',
+        submit: 'Klasör oluştur',
+        action: async folderPath => {
+            addFolder(folderPath);
+        }
+    });
+    setFolderFileHandler(promptNewFile);
+    $('btnAddFile').onclick = () => promptNewFile('');
+    $('btnAddFolder').onclick = promptNewFolder;
     $('btnRenameFile').onclick = () => ask({ title: 'Dosyayı yeniden adlandır', label: 'Yeni dosya yolu', value: activeFile, note: 'HTML import ve bağlantı yollarını da güncellemeyi unutma.', submit: 'Yeniden adlandır', action: async path => {
         if (!safePath(path)) throw Error('Geçerli bir dosya yolu girin.');
         if (path === activeFile) return;

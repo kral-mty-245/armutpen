@@ -182,13 +182,19 @@ def restore(project_id: str, version_id: str, user=Depends(current_user)):
 
 
 class AiRequest(BaseModel):
-    provider: Literal['gemini', 'openai', 'anthropic', 'deepseek']
+    provider: str = Field(min_length=1, max_length=64)
     key: str = Field(min_length=1, max_length=1024)
     prompt: str = Field(min_length=1, max_length=12000)
     thinking: Literal['low', 'medium', 'high'] = 'medium'
     system_prompt: str = Field(default='', max_length=6000)
     reference: str | None = None
     revision: int
+    @field_validator('provider')
+    @classmethod
+    def provider_valid(cls, value):
+        if value not in MODELS:
+            raise ValueError('Geçersiz model seçimi.')
+        return value
 
 
 @app.post('/api/projects/{project_id}/ai')

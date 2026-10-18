@@ -6,10 +6,50 @@ import httpx
 from fastapi import HTTPException
 
 MODELS = {
-    'gemini': {'label': 'Gemini 3.1 Pro', 'model': 'gemini-3.1-pro-preview'},
-    'openai': {'label': 'ChatGPT 5.6 Luna', 'model': 'gpt-5.6-luna'},
-    'anthropic': {'label': 'Claude Sonnet 5', 'model': 'claude-sonnet-5'},
-    'deepseek': {'label': 'DeepSeek V4.1 Flash', 'model': 'deepseek-v4.1-flash'},
+    # Google Gemini
+    'gemini': {'label': 'Gemini 3.1 Pro', 'model': 'gemini-3.1-pro-preview', 'provider': 'gemini', 'provider_label': 'Google Gemini'},
+    'gemini-flash': {'label': 'Gemini 3.1 Flash', 'model': 'gemini-3.1-flash-preview', 'provider': 'gemini', 'provider_label': 'Google Gemini'},
+    'gemini-ultra': {'label': 'Gemini 3.1 Ultra Think', 'model': 'gemini-3.1-ultra-preview', 'provider': 'gemini', 'provider_label': 'Google Gemini'},
+    'gemini-2.5-pro': {'label': 'Gemini 2.5 Pro', 'model': 'gemini-2.5-pro', 'provider': 'gemini', 'provider_label': 'Google Gemini'},
+    'gemini-2.5-flash': {'label': 'Gemini 2.5 Flash', 'model': 'gemini-2.5-flash', 'provider': 'gemini', 'provider_label': 'Google Gemini'},
+    # OpenAI
+    'openai': {'label': 'ChatGPT 5.6 Luna', 'model': 'gpt-5.6-luna', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    'gpt-5.4-pro': {'label': 'GPT-5.4 Pro', 'model': 'gpt-5.4-pro', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    'gpt-5.4-mini': {'label': 'GPT-5.4 Mini', 'model': 'gpt-5.4-mini', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    'o3-pro': {'label': 'OpenAI o3 Pro (Reasoning)', 'model': 'o3-pro', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    'o4-mini': {'label': 'OpenAI o4-mini (Reasoning)', 'model': 'o4-mini', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    'gpt-4.1': {'label': 'GPT-4.1', 'model': 'gpt-4.1', 'provider': 'openai', 'provider_label': 'OpenAI (ChatGPT)'},
+    # Anthropic Claude
+    'anthropic': {'label': 'Claude Sonnet 5', 'model': 'claude-sonnet-5', 'provider': 'anthropic', 'provider_label': 'Anthropic (Claude)'},
+    'claude-opus-5': {'label': 'Claude Opus 5', 'model': 'claude-opus-5', 'provider': 'anthropic', 'provider_label': 'Anthropic (Claude)'},
+    'claude-haiku-5': {'label': 'Claude Haiku 5 Fast', 'model': 'claude-haiku-5', 'provider': 'anthropic', 'provider_label': 'Anthropic (Claude)'},
+    'claude-4.5-sonnet': {'label': 'Claude 4.5 Sonnet', 'model': 'claude-sonnet-4-5', 'provider': 'anthropic', 'provider_label': 'Anthropic (Claude)'},
+    # DeepSeek
+    'deepseek': {'label': 'DeepSeek V4.1 Flash', 'model': 'deepseek-v4.1-flash', 'provider': 'deepseek', 'provider_label': 'DeepSeek'},
+    'deepseek-r2': {'label': 'DeepSeek R2 (Reasoner)', 'model': 'deepseek-r2', 'provider': 'deepseek', 'provider_label': 'DeepSeek'},
+    'deepseek-v3': {'label': 'DeepSeek V3 Chat', 'model': 'deepseek-chat', 'provider': 'deepseek', 'provider_label': 'DeepSeek'},
+    'deepseek-r1': {'label': 'DeepSeek R1 (Reasoner)', 'model': 'deepseek-reasoner', 'provider': 'deepseek', 'provider_label': 'DeepSeek'},
+    # xAI Grok
+    'grok-4': {'label': 'Grok 4', 'model': 'grok-4', 'provider': 'xai', 'provider_label': 'xAI (Grok)'},
+    'grok-4-mini': {'label': 'Grok 4 Mini Fast', 'model': 'grok-4-mini', 'provider': 'xai', 'provider_label': 'xAI (Grok)'},
+    'grok-3': {'label': 'Grok 3', 'model': 'grok-3', 'provider': 'xai', 'provider_label': 'xAI (Grok)'},
+    # Mistral / Codestral
+    'codestral': {'label': 'Codestral 25.08 (Kod Uzmanı)', 'model': 'codestral-latest', 'provider': 'mistral', 'provider_label': 'Mistral / Codestral'},
+    'mistral-large': {'label': 'Mistral Large 3', 'model': 'mistral-large-latest', 'provider': 'mistral', 'provider_label': 'Mistral / Codestral'},
+    # Groq
+    'llama-4-maverick': {'label': 'Llama 4 Maverick (Groq)', 'model': 'meta-llama/llama-4-maverick-17b-128e-instruct', 'provider': 'groq', 'provider_label': 'Groq (Ultra Hızlı)'},
+    'qwen-3-coder': {'label': 'Qwen 3 Coder 480B (Groq)', 'model': 'qwen/qwen3-coder-480b', 'provider': 'groq', 'provider_label': 'Groq (Ultra Hızlı)'},
+    # OpenRouter
+    'openrouter-auto': {'label': 'OpenRouter Auto (Tüm Modeller)', 'model': 'openrouter/auto', 'provider': 'openrouter', 'provider_label': 'OpenRouter'},
+}
+
+OPENAI_COMPAT_URLS = {
+    'openai': 'https://api.openai.com/v1/chat/completions',
+    'deepseek': 'https://api.deepseek.com/chat/completions',
+    'xai': 'https://api.x.ai/v1/chat/completions',
+    'mistral': 'https://api.mistral.ai/v1/chat/completions',
+    'groq': 'https://api.groq.com/openai/v1/chat/completions',
+    'openrouter': 'https://openrouter.ai/api/v1/chat/completions',
 }
 
 async def request_json(client, method, url, **kwargs):
@@ -23,8 +63,10 @@ async def request_json(client, method, url, **kwargs):
     return response.json() if response.content else {}
 
 
-async def generate(provider, key, prompt, thinking, system_prompt):
-    model = MODELS[provider]['model']
+async def generate(model_key, key, prompt, thinking, system_prompt):
+    info = MODELS[model_key]
+    model = info['model']
+    provider = info.get('provider', model_key)
     system = ('Sen NOMI AI, bir web proje asistanısın. Yalnızca JSON döndür: '
               '{"summary":"Türkçe yanıt", "projectName":"kısa proje adı", "updateFiles":{"dosya/yolu":"tam içerik"}, "action":null}. '
               'action yalnızca null, create-repo, push veya pages olabilir; bu işlemler kullanıcı onayı ister. '
@@ -42,11 +84,11 @@ async def generate(provider, key, prompt, thinking, system_prompt):
             data = await request_json(client, 'POST', 'https://api.anthropic.com/v1/messages', headers={'x-api-key': key, 'anthropic-version': '2023-06-01'}, json=body)
             raw = ''.join(p.get('text', '') for p in data.get('content', []) if p.get('type') == 'text')
         else:
-            url = 'https://api.openai.com/v1/chat/completions' if provider == 'openai' else 'https://api.deepseek.com/chat/completions'
+            url = OPENAI_COMPAT_URLS.get(provider, 'https://api.openai.com/v1/chat/completions')
             body = {'model': model, 'messages': [{'role': 'system', 'content': system}, {'role': 'user', 'content': prompt}], 'response_format': {'type': 'json_object'}}
             if provider == 'openai':
                 body['reasoning_effort'] = thinking
-            else:
+            elif provider == 'deepseek':
                 body['thinking'] = {'type': 'enabled' if thinking != 'low' else 'disabled'}
             data = await request_json(client, 'POST', url, headers={'Authorization': 'Bearer ' + key}, json=body)
             raw = data.get('choices', [{}])[0].get('message', {}).get('content', '')
