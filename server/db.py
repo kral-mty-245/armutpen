@@ -6,7 +6,8 @@ from contextlib import contextmanager
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-DB_PATH = os.getenv('DB_PATH', '/data/armut.sqlite3')
+# Vercel functions can only write to /tmp (ephemeral: data is lost on cold starts).
+DB_PATH = os.getenv('DB_PATH', '/tmp/armut.sqlite3' if os.getenv('VERCEL') == '1' else '/data/armut.sqlite3')
 
 
 def day():
